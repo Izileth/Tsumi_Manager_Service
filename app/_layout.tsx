@@ -2,31 +2,23 @@
 import { Slot, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
+import { AuthProvider, useAuth } from "./auth-context";
 import LoadingScreen from "./_loading";
 import '@/global.css';
 
-// Simulate checking for a token
-const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const InitialLayout = () => {
+  const { isAuthenticated } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // In a real app, you'd check for a token here
-      setIsAuthenticated(false); // Start with the user logged out
       setIsLoading(false);
-    }, 2000); // 2-second loading screen
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
-
-  return { isAuthenticated, isLoading };
-};
-
-export default function RootLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
@@ -49,5 +41,13 @@ export default function RootLayout() {
       <Slot />
       <StatusBar style="auto" />
     </>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <InitialLayout />
+    </AuthProvider>
   );
 }

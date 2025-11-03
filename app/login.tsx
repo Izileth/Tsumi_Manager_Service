@@ -1,12 +1,21 @@
 import { View, Text, TextInput, Pressable } from "react-native";
-import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useAuth } from "./auth-context";
 
 export default function LoginScreen() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleLogin = () => {
+    if (username && password) {
+      login();
+    } else {
+      // Optionally, add some user feedback here, e.g., an alert
+      console.log("Please enter both username and password.");
+    }
+  };
 
   return (
     <View className="flex-1 bg-black">
@@ -63,7 +72,7 @@ export default function LoginScreen() {
 
           {/* Login Button */}
           <Pressable 
-            onPress={() => router.navigate("/")}
+            onPress={handleLogin}
             className="w-full h-14 bg-red-600 rounded-xl justify-center items-center active:bg-red-700 shadow-lg shadow-red-600/40"
           >
             <Text className="text-lg font-bold text-white tracking-wide">Entrar</Text>

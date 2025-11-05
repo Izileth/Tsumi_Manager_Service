@@ -13,7 +13,7 @@ export default function ProfileScreen() {
 
 
   const getRarityColor = (rarity: string) => {
-    switch(rarity) {
+    switch (rarity) {
       case "legendary": return { bg: "bg-yellow-950/20 border-yellow-900/50", text: "text-yellow-500", badge: "bg-yellow-950/30" };
       case "epic": return { bg: "bg-purple-950/20 border-purple-900/50", text: "text-purple-500", badge: "bg-purple-950/30" };
       case "rare": return { bg: "bg-blue-950/20 border-blue-900/50", text: "text-blue-500", badge: "bg-blue-950/30" };
@@ -57,7 +57,7 @@ export default function ProfileScreen() {
 
       {/* CONTEÚDO */}
       <View className="px-6 pt-6">
-        
+
         {/* Cards de Info Rápida */}
         <View className="flex-row gap-3 mb-6">
           <View className="flex-1 bg-zinc-950 border border-neutral-800 rounded-lg p-4">
@@ -93,9 +93,9 @@ export default function ProfileScreen() {
             </Text>
           </View>
           <View className="bg-neutral-900 h-3 rounded-full overflow-hidden">
-            <View 
-              className="bg-gradient-to-r from-red-600 to-red-500 h-full" 
-              style={{ width: `${(playerStats.experience / playerStats.nextLevelXP) * 100}%` }} 
+            <View
+              className="bg-gradient-to-r from-red-600 to-red-500 h-full"
+              style={{ width: `${(playerStats.experience / playerStats.nextLevelXP) * 100}%` }}
             />
           </View>
           <Text className="text-neutral-600 text-xs mt-2">
@@ -127,14 +127,12 @@ export default function ProfileScreen() {
                 onPress={() => setSelectedTab("stats")}
                 className="active:opacity-70"
               >
-                <View className={`px-5 py-3 rounded-lg border ${
-                  selectedTab === "stats" 
-                    ? 'bg-red-600 border-red-500' 
+                <View className={`px-5 py-3 rounded-lg border ${selectedTab === "stats"
+                    ? 'bg-red-600 border-red-500'
                     : 'bg-zinc-950 border-neutral-800'
-                }`}>
-                  <Text className={`text-sm font-semibold ${
-                    selectedTab === "stats" ? 'text-white' : 'text-neutral-400'
                   }`}>
+                  <Text className={`text-sm font-semibold ${selectedTab === "stats" ? 'text-white' : 'text-neutral-400'
+                    }`}>
                     📊 Atributos
                   </Text>
                 </View>
@@ -144,14 +142,12 @@ export default function ProfileScreen() {
                 onPress={() => setSelectedTab("achievements")}
                 className="active:opacity-70"
               >
-                <View className={`px-5 py-3 rounded-lg border ${
-                  selectedTab === "achievements" 
-                    ? 'bg-red-600 border-red-500' 
+                <View className={`px-5 py-3 rounded-lg border ${selectedTab === "achievements"
+                    ? 'bg-red-600 border-red-500'
                     : 'bg-zinc-950 border-neutral-800'
-                }`}>
-                  <Text className={`text-sm font-semibold ${
-                    selectedTab === "achievements" ? 'text-white' : 'text-neutral-400'
                   }`}>
+                  <Text className={`text-sm font-semibold ${selectedTab === "achievements" ? 'text-white' : 'text-neutral-400'
+                    }`}>
                     🏆 Conquistas
                   </Text>
                 </View>
@@ -161,14 +157,12 @@ export default function ProfileScreen() {
                 onPress={() => setSelectedTab("history")}
                 className="active:opacity-70"
               >
-                <View className={`px-5 py-3 rounded-lg border ${
-                  selectedTab === "history" 
-                    ? 'bg-red-600 border-red-500' 
+                <View className={`px-5 py-3 rounded-lg border ${selectedTab === "history"
+                    ? 'bg-red-600 border-red-500'
                     : 'bg-zinc-950 border-neutral-800'
-                }`}>
-                  <Text className={`text-sm font-semibold ${
-                    selectedTab === "history" ? 'text-white' : 'text-neutral-400'
                   }`}>
+                  <Text className={`text-sm font-semibold ${selectedTab === "history" ? 'text-white' : 'text-neutral-400'
+                    }`}>
                     📜 Histórico
                   </Text>
                 </View>
@@ -270,32 +264,29 @@ export default function ProfileScreen() {
               return (
                 <View
                   key={achievement.id}
-                  className={`mb-3 rounded-lg border p-4 ${
-                    achievement.unlocked ? rarityStyle.bg : 'bg-neutral-950/50 border-neutral-900'
-                  } ${!achievement.unlocked && 'opacity-60'}`}
+                  className={`mb-3 rounded-lg border p-4 ${achievement.unlocked ? rarityStyle.bg : 'bg-neutral-950/50 border-neutral-900'
+                    } ${!achievement.unlocked && 'opacity-60'}`}
                 >
                   <View className="flex-row items-start gap-3">
                     <Text className="text-4xl">{achievement.icon}</Text>
                     <View className="flex-1">
                       <View className="flex-row items-center gap-2 mb-1">
-                        <Text className={`text-base font-bold ${
-                          achievement.unlocked ? 'text-white' : 'text-neutral-600'
-                        }`}>
+                        <Text className={`text-base font-bold ${achievement.unlocked ? 'text-white' : 'text-neutral-600'
+                          }`}>
                           {achievement.title}
                         </Text>
                         {achievement.unlocked && (
                           <View className={`${rarityStyle.badge} px-2 py-0.5 rounded`}>
                             <Text className={`text-xs font-semibold ${rarityStyle.text}`}>
-                              {achievement.rarity === "legendary" ? "LENDÁRIA" : 
-                               achievement.rarity === "epic" ? "ÉPICA" : 
-                               achievement.rarity === "rare" ? "RARA" : "COMUM"}
+                              {achievement.rarity === "legendary" ? "LENDÁRIA" :
+                                achievement.rarity === "epic" ? "ÉPICA" :
+                                  achievement.rarity === "rare" ? "RARA" : "COMUM"}
                             </Text>
                           </View>
                         )}
                       </View>
-                      <Text className={`text-xs mb-2 ${
-                        achievement.unlocked ? 'text-neutral-400' : 'text-neutral-600'
-                      }`}>
+                      <Text className={`text-xs mb-2 ${achievement.unlocked ? 'text-neutral-400' : 'text-neutral-600'
+                        }`}>
                         {achievement.description}
                       </Text>
                       {achievement.unlocked ? (
@@ -305,9 +296,9 @@ export default function ProfileScreen() {
                       ) : achievement.progress !== undefined && (
                         <View>
                           <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden mb-1">
-                            <View 
-                              className="bg-neutral-700 h-full" 
-                              style={{ width: `${achievement.progress}%` }} 
+                            <View
+                              className="bg-neutral-700 h-full"
+                              style={{ width: `${achievement.progress}%` }}
                             />
                           </View>
                           <Text className="text-neutral-600 text-xs">
@@ -348,9 +339,8 @@ export default function ProfileScreen() {
                     <Text className="text-white text-sm font-semibold mb-1">
                       {item.title}
                     </Text>
-                    <Text className={`text-xs font-semibold mb-2 ${
-                      item.reward.includes('-') ? 'text-red-400' : 'text-green-400'
-                    }`}>
+                    <Text className={`text-xs font-semibold mb-2 ${item.reward.includes('-') ? 'text-red-400' : 'text-green-400'
+                      }`}>
                       {item.reward}
                     </Text>
                     <Text className="text-neutral-600 text-xs">
@@ -372,18 +362,21 @@ export default function ProfileScreen() {
         )}
 
         {/* Modal Button */}
-        <Pressable onPress={() => setModalVisible(true)} className="active:opacity-70 mt-4">
-          <View className="bg-blue-900/50 border border-blue-800 rounded-lg py-3 items-center">
-            <Text className="text-blue-400 font-bold text-sm">Open Modal</Text>
-          </View>
-        </Pressable>
+        <View className="mb-6 gap-0 flex flex-col items-center  w-full max-w-full ">
+          <Pressable onPress={() => setModalVisible(true)} className="active:opacity-70 mt-4 w-full">
+            <View className="bg-zinc-950 border border-neutral-800 rounded-lg py-3 items-center">
+              <Text className="text-zinc-50 font-bold text-sm">Edição de Perfil</Text>
+            </View>
+          </Pressable>
 
-        {/* Logout Button */}
-        <Pressable onPress={logout} className="active:opacity-70 mt-8 mb-4">
-          <View className="bg-red-900/50 border border-red-800 rounded-lg py-3 items-center">
-            <Text className="text-red-400 font-bold text-sm">Sair da Conta</Text>
-          </View>
-        </Pressable>
+          {/* Logout Button */}
+          <Pressable onPress={logout} className="active:opacity-70 mt-4 mb-4 w-full">
+            <View className="bg-red-900/50 border border-red-800 rounded-lg py-3 items-center">
+              <Text className="text-red-400 font-bold text-sm">Sair da Conta</Text>
+            </View>
+          </Pressable>
+
+        </View>
 
         {/* Footer */}
         <View className="items-center py-8 mb-6">
@@ -397,15 +390,18 @@ export default function ProfileScreen() {
           </Text>
         </View>
       </View>
-      <CustomModal 
-        visible={isModalVisible} 
+
+      <CustomModal
+        visible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        title="Título do Modal"
+        title="Edição de Perfil"
         titleJP="警告" // Opcional
       >
-        <Text className="text-white">Conteúdo aqui</Text>
+        <Text className="text-neutral-300 text-sm leading-6 text-center">
+          Esta é uma modal personalizada para edição de perfil. Aqui você pode adicionar formulários ou outras funcionalidades conforme necessário.
+        </Text>
       </CustomModal>
-      
+
     </ScrollView>
   );
 }

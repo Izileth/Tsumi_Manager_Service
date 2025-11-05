@@ -22,6 +22,7 @@ export function CustomModal({
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
+      className='w-full max-w-full '
     >
       {/* Backdrop com blur escuro */}
       <Pressable 
@@ -69,7 +70,7 @@ export function CustomModal({
                 className="active:opacity-70"
                 onPress={onClose}
               >
-                <View className="bg-red-600 rounded-lg py-3.5 items-center">
+                <View className="bg-red-600 rounded-lg py-2 items-center">
                   <Text className="text-white font-bold text-sm tracking-wider">
                     FECHAR
                   </Text>

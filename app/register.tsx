@@ -51,7 +51,7 @@ export default function RegisterScreen() {
       <View className="flex-1 justify-center items-center px-8">
         {/* Logo */}
         <View className="items-center mb-12">
-          <View className="w-20 h-20 rounded-full bg-neutral-900 border-2 border-red-600 justify-center items-center mb-4 shadow-lg shadow-red-600/50">
+          <View className="w-20 h-20 rounded-full bg-transparent border-2 border-red-600 justify-center items-center mb-4 shadow-lg shadow-red-600/50">
             <Text className="text-4xl text-red-600 font-bold">罪</Text>
           </View>
           <Text className="text-5xl font-bold text-white tracking-widest mb-1">TSUMI</Text>

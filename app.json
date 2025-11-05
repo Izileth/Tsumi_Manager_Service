@@ -10,7 +10,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kawak.Tsumi",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +23,7 @@
         "backgroundImage": "https://i.pinimg.com/1200x/b0/4c/2c/b04c2cf4c6130897812a2dbbf3e1cdae.jpg",
         "monochromeImage": "https://i.pinimg.com/1200x/b0/4c/2c/b04c2cf4c6130897812a2dbbf3e1cdae.jpg"
       },
+      "package": "com.kawak.Tsumi",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -45,7 +50,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "772b23a8-f739-4643-8226-9175e06bfa03"
+      }
     }
   }
 }
-

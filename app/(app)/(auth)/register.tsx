@@ -1,9 +1,10 @@
 import { View, Text, TextInput, Pressable } from "react-native";
 import { useState } from "react";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { User, Lock, Eye, EyeOff, Mail } from "lucide-react-native";
 
 export default function RegisterScreen() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -150,11 +151,9 @@ export default function RegisterScreen() {
           {/* Sign In */}
           <View className="flex-row justify-center items-center">
             <Text className="text-neutral-400 text-sm">Já tem uma conta? </Text>
-            <Link href="/(app)/(auth)/login" asChild>
-              <Pressable>
-                <Text className="text-red-600 text-sm font-semibold">Entre</Text>
-              </Pressable>
-            </Link>
+            <Pressable onPress={() => router.push('/(app)/(auth)/login')}>
+              <Text className="text-red-600 text-sm font-semibold">Entre</Text>
+            </Pressable>
           </View>
         </View>
 

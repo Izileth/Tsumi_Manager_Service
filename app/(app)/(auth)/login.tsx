@@ -1,11 +1,12 @@
 import { View, Text, TextInput, Pressable } from "react-native";
 import { useState } from "react";
 import { useAuth } from "../../context/auth-context";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { User, Lock, Eye, EyeOff } from "lucide-react-native";
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -82,11 +83,9 @@ export default function LoginScreen() {
           ) : null}
 
           {/* Forgot Password */}
-          <Link href="/(app)/(password)/forgot-password" asChild>
-            <Pressable className="self-end mb-6">
-              <Text className="text-neutral-400 text-sm">Esqueceu a senha?</Text>
-            </Pressable>
-          </Link>
+          <Pressable className="self-end mb-6" onPress={() => router.push('/(app)/(password)/forgot-password')}>
+            <Text className="text-neutral-400 text-sm">Esqueceu a senha?</Text>
+          </Pressable>
 
           {/* Login Button */}
           <Pressable 
@@ -106,11 +105,9 @@ export default function LoginScreen() {
           {/* Sign Up */}
           <View className="flex-row justify-center items-center">
             <Text className="text-neutral-400 text-sm">Não tem uma conta? </Text>
-            <Link href="/(app)/(auth)/register" asChild>
-              <Pressable>
-                <Text className="text-red-600 text-sm font-semibold">Cadastre-se</Text>
-              </Pressable>
-            </Link>
+            <Pressable onPress={() => router.push('/(app)/(auth)/register')}>
+              <Text className="text-red-600 text-sm font-semibold">Cadastre-se</Text>
+            </Pressable>
           </View>
         </View>
 

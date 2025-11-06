@@ -5,11 +5,7 @@ export default function AppLayout() {
   return (
     <Stack
       screenOptions={{
-        contentStyle: { backgroundColor: 'black' },
-        headerStyle: { backgroundColor: 'black' },
-        headerTitleStyle: { color: 'white' },
-        headerTintColor: 'white',
-        headerTitleAlign: 'center',
+        headerShown: false,  
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false, gestureEnabled: true }} />

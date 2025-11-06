@@ -1,9 +1,10 @@
 import { View, Text, TextInput, Pressable } from "react-native";
 import { useState } from "react";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { Lock, Eye, EyeOff } from "lucide-react-native";
 
 export default function ResetPasswordScreen() {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -114,11 +115,9 @@ export default function ResetPasswordScreen() {
 
           {/* Back to Login */}
           <View className="flex-row justify-center items-center">
-            <Link href="/(app)/(auth)/login" asChild>
-              <Pressable>
-                <Text className="text-red-600 text-sm font-semibold">Voltar para o Login</Text>
-              </Pressable>
-            </Link>
+            <Pressable onPress={() => router.push('/(app)/(auth)/login')}>
+              <Text className="text-red-600 text-sm font-semibold">Voltar para o Login</Text>
+            </Pressable>
           </View>
         </View>
 

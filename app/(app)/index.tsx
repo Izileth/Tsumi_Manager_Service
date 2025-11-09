@@ -1,7 +1,9 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { Link } from "expo-router";
+import { useAuth } from "../context/auth-context";
 
 export default function HomeScreen() {
+    const { logout } = useAuth();
   return (
     <ScrollView className="flex-1 bg-black">
       {/* HERO SECTION com gradiente vermelho dramático */}
@@ -180,6 +182,12 @@ export default function HomeScreen() {
             de lealdade e sacrifício.
           </Text>
         </View>
+        
+        <Pressable onPress={logout} className="active:opacity-70 mt-4 mb-4 w-full">
+            <View className="bg-red-900/50 border border-red-800 rounded-lg py-3 items-center">
+              <Text className="text-red-400 font-bold text-sm">Sair da Conta</Text>
+            </View>
+          </Pressable>
 
         {/* Footer com símbolo */}
         <View className="items-center py-10 mb-6">

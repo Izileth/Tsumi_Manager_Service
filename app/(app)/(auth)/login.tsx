@@ -111,8 +111,8 @@ export default function LoginScreen() {
           {/* Sign Up */}
           <View className="flex-row justify-center items-center">
             <Text className="text-neutral-400 text-sm">Não tem uma conta? </Text>
-            <Pressable onPress={() => router.push('/(app)/(auth)/register')}>
-              <Text className="text-red-600 text-sm font-semibold">Cadastre-se</Text>
+            <Pressable onPress={() => router.push('/register')}>
+              <Text className="text-red-600 text-sm font-semibold underline">Cadastre-se</Text>
             </Pressable>
           </View>
         </View>

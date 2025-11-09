@@ -1,12 +1,14 @@
-import { achievements, attributes, history, playerStats } from "@/constants";
+import { achievements, attributes, history } from "@/constants";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View, ActivityIndicator } from "react-native";
 import { CustomModal } from "../../../components/ui/custom-modal";
 import { skills } from "../../../constants/skills-data";
 import { useAuth } from "../../context/auth-context";
+import { useUserProfile } from "../../hooks/useUserProfile";
 
 export default function ProfileScreen() {
   const { logout } = useAuth();
+  const { profile, loading, error } = useUserProfile();
   const [selectedTab, setSelectedTab] = useState("stats");
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -18,6 +20,24 @@ export default function ProfileScreen() {
       default: return { bg: "bg-neutral-950/20 border-neutral-800", text: "text-neutral-500", badge: "bg-neutral-900" };
     }
   };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-black">
+        <ActivityIndicator size="large" color="#DC2626" />
+        <Text className="text-neutral-400 mt-4">Carregando perfil...</Text>
+      </View>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <View className="flex-1 justify-center items-center bg-black">
+        <Text className="text-red-500">Erro ao carregar o perfil.</Text>
+        <Text className="text-neutral-400 text-center mt-2 px-4">{error?.message || "Não foi possível encontrar os dados do perfil."}</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView className="flex-1 bg-black">
@@ -35,16 +55,16 @@ export default function ProfileScreen() {
 
           {/* Nome */}
           <Text className="text-2xl font-black text-white tracking-wider text-center mb-1">
-            {playerStats.nameJP}
+            {profile.username_jp || 'N/A'}
           </Text>
           <Text className="text-base font-semibold text-neutral-400 mb-2">
-            {playerStats.name}
+            {profile.username}
           </Text>
 
           {/* Rank Badge */}
           <View className="bg-red-600 px-4 py-1.5 rounded-full">
             <Text className="text-white text-xs font-bold tracking-wider">
-              {playerStats.rankJP} • {playerStats.rank}
+              {profile.rank_jp || '...'} • {profile.rank || '...'}
             </Text>
           </View>
         </View>
@@ -62,21 +82,21 @@ export default function ProfileScreen() {
             <Text className="text-neutral-500 text-xs uppercase tracking-wider mb-1">
               Nível
             </Text>
-            <Text className="text-white text-2xl font-bold">{playerStats.level}</Text>
+            <Text className="text-white text-2xl font-bold">{profile.level}</Text>
           </View>
 
           <View className="flex-1 bg-zinc-950 border border-neutral-800 rounded-lg p-4">
             <Text className="text-neutral-500 text-xs uppercase tracking-wider mb-1">
               Dinheiro
             </Text>
-            <Text className="text-green-500 text-lg font-bold">¥{playerStats.money.toLocaleString()}</Text>
+            <Text className="text-green-500 text-lg font-bold">¥{profile.money.toLocaleString()}</Text>
           </View>
 
           <View className="flex-1 bg-zinc-950 border border-neutral-800 rounded-lg p-4">
             <Text className="text-neutral-500 text-xs uppercase tracking-wider mb-1">
               Reputação
             </Text>
-            <Text className="text-yellow-500 text-lg font-bold">{playerStats.reputation.toLocaleString()}</Text>
+            <Text className="text-yellow-500 text-lg font-bold">{profile.reputation.toLocaleString()}</Text>
           </View>
         </View>
 
@@ -87,17 +107,17 @@ export default function ProfileScreen() {
               Experiência
             </Text>
             <Text className="text-white text-xs font-semibold">
-              {playerStats.experience.toLocaleString()} / {playerStats.nextLevelXP.toLocaleString()} XP
+              {profile.experience.toLocaleString()} / {profile.next_level_xp.toLocaleString()} XP
             </Text>
           </View>
           <View className="bg-neutral-900 h-3 rounded-full overflow-hidden">
             <View
               className="bg-gradient-to-r from-red-600 to-red-500 h-full"
-              style={{ width: `${(playerStats.experience / playerStats.nextLevelXP) * 100}%` }}
+              style={{ width: `${(profile.experience / profile.next_level_xp) * 100}%` }}
             />
           </View>
           <Text className="text-neutral-600 text-xs mt-2">
-            {Math.round((playerStats.experience / playerStats.nextLevelXP) * 100)}% para o próximo nível
+            {Math.round((profile.experience / profile.next_level_xp) * 100)}% para o próximo nível
           </Text>
         </View>
 
@@ -107,13 +127,13 @@ export default function ProfileScreen() {
             Família
           </Text>
           <Text className="text-white text-lg font-bold mb-1">
-            {playerStats.clan}
+            {profile.clan}
           </Text>
           <Text className="text-neutral-400 text-sm mb-2">
-            {playerStats.clanName}
+            {profile.clan_name}
           </Text>
           <Text className="text-neutral-600 text-xs">
-            Membro desde {playerStats.joinedDate}
+            Membro desde {new Date(profile.joined_date).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
           </Text>
         </View>
 
@@ -201,10 +221,10 @@ export default function ProfileScreen() {
                     Sua dedicação à família
                   </Text>
                 </View>
-                <Text className="text-white text-2xl font-bold">{playerStats.loyalty}%</Text>
+                <Text className="text-white text-2xl font-bold">{profile.loyalty}%</Text>
               </View>
               <View className="bg-neutral-900 h-3 rounded-full overflow-hidden">
-                <View className="bg-red-600 h-full" style={{ width: `${playerStats.loyalty}%` }} />
+                <View className="bg-red-600 h-full" style={{ width: `${profile.loyalty}%` }} />
               </View>
             </View>
 

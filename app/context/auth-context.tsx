@@ -5,7 +5,7 @@ import * as Notifications from 'expo-notifications';
 
 interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  logout: () => Promise<void>;
   session: Session | null;
   user: User | null;
   loading: boolean;
@@ -62,14 +62,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             body: 'Bem-vindo de volta!',
           },
           trigger: { 
-            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
             seconds: 1,
-            repeats: false
           },
         });
 
     },
-    signOut: async () => {
+    logout: async () => {
       await supabase.auth.signOut();
     },
     session,

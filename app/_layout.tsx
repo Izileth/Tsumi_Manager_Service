@@ -23,18 +23,18 @@ const RootLayoutNav = () => {
   useEffect(() => {
     // Wait until auth is loaded and splash animation is done
     if (loading || !isSplashAnimationFinished) return;
-  
-    // Use a safe string check in case the segments type doesn't include the literal "(auth)"
-    const inAuthGroup = segments[0]?.startsWith('(auth') ?? false;
-  
-    // If the user is not signed in and the initial segment is not anything in the auth group,
+
+    // An auth flow route is one that lives in the (auth) or (password) groups.
+    const inAuthFlow = segments[1] === '(auth)' || segments[1] === '(password)';
+
+    // If the user is not signed in and is not in an auth flow route,
     // redirect to the login page.
-    if (!user && !inAuthGroup) {
+    if (!user && !inAuthFlow) {
       router.replace('/(app)/(auth)/login');
     } 
-    // If the user is signed in and the initial segment is in the auth group,
+    // If the user is signed in and is trying to access an auth flow route,
     // redirect to the main app screen.
-    else if (user && inAuthGroup) {
+    else if (user && inAuthFlow) {
       router.replace('/(app)');
     }
   }, [user, loading, segments, router, isSplashAnimationFinished]);

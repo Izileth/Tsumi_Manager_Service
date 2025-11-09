@@ -40,6 +40,11 @@ export default function AppLayout() {
       <Stack.Screen name="(screens)/profile" options={{ title: 'Perfil', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/missions" options={{ title: 'Missões', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/dojo" options={{ title: 'Dojo', headerShown: false, gestureEnabled: true }} />
+      
+      <Stack.Screen name="/(auth)/login" options={{ title: 'Login', headerShown: false, gestureEnabled: true }} />
+      <Stack.Screen name="/(auth)/register" options={{ title: 'Registro', headerShown: false, gestureEnabled: true }} />
+      <Stack.Screen name="/(password)/forgot-password" options={{ title: 'Esqueci minha senha', headerShown: false, gestureEnabled: true }} />
+      <Stack.Screen name="/(password)/reset-password" options={{ title: 'Redefinir senha', headerShown: false, gestureEnabled: true }} />
     </Stack>
   );
 }

@@ -128,11 +128,11 @@ export default function LoadingScreen({ onAnimationEnd }: LoadingScreenProps) {
           紅龍組
         </Text>
         <Text className="text-red-500 text-base font-semibold tracking-widest">
-          BENIRYU-GUMI
+          プラットフォーム
         </Text>
         <View className="h-px w-24 bg-red-600 mt-3 mb-2" />
         <Text className="text-neutral-500 text-xs tracking-[0.3em] uppercase">
-          Yakuza Brotherhood
+          Welcome to the underworld
         </Text>
       </Animated.View>
     </View>

@@ -41,7 +41,15 @@ export const useUserProfile = () => {
     try {
       const { data, error: fetchError } = await supabase
         .from('profiles')
-        .select('*, clans(name)')
+                .select(`
+          *,
+          clans (
+            *,
+            profiles (
+              username
+            )
+          )
+        `)
         .eq('id', user.id);
 
       if (fetchError) {

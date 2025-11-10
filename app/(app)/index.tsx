@@ -1,9 +1,42 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { Link } from "expo-router";
 import { useAuth } from "../context/auth-context";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function HomeScreen() {
     const { logout } = useAuth();
+    const { profile, loading, error } = useUserProfile();
+
+    if (loading) {
+        return (
+            <View className="flex-1 justify-center items-center bg-black">
+                <ActivityIndicator size="large" color="#DC2626" />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View className="flex-1 justify-center items-center bg-black">
+                <Text className="text-red-500">Erro ao carregar o perfil.</Text>
+            </View>
+        );
+    }
+
+    if (!profile) {
+        return (
+            <View className="flex-1 justify-center items-center bg-black px-6">
+                <Text className="text-white text-xl font-bold text-center mb-4">Crie seu Perfil</Text>
+                <Text className="text-neutral-400 text-center mb-6">Complete seu perfil para começar sua jornada.</Text>
+                <Link href="/profile" asChild>
+                    <Pressable className="p-3 bg-red-600 rounded-lg">
+                        <Text className="text-white font-bold">Criar Perfil</Text>
+                    </Pressable>
+                </Link>
+            </View>
+        );
+    }
+
   return (
     <ScrollView className="flex-1 bg-black">
       {/* HERO SECTION com gradiente vermelho dramático */}
@@ -46,7 +79,7 @@ export default function HomeScreen() {
         {/* Boas-vindas */}
         <View className="mb-8">
           <Text className="text-white text-3xl font-bold mb-2">
-            Bem-vindo, Wakashu
+            Bem-vindo, {profile.username || 'Wakashu'}
           </Text>
           <Text className="text-neutral-400 text-base leading-6">
             Este é o seu caminho para ascender na hierarquia. Domine os territórios, 
@@ -63,7 +96,7 @@ export default function HomeScreen() {
           
           <Text className="text-neutral-300 text-base leading-7 mb-4">
             O yakuza segue uma estrutura rígida de respeito e lealdade. 
-            Seu rank atual é <Text className="text-red-500 font-bold">若衆 (Wakashu)</Text>, 
+            Seu rank atual é <Text className="text-red-500 font-bold">{profile.rank_jp || '若衆'} ({profile.rank || 'Wakashu'})</Text>, 
             o primeiro passo na jornada. Acumule <Text className="text-white font-semibold">pontos de lealdade</Text> para 
             subir para Kyodai e eventualmente tornar-se um Oyabun.
           </Text>

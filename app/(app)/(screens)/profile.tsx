@@ -6,12 +6,14 @@ import { useUserProfile } from "../../hooks/useUserProfile";
 import { supabase } from "../../lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
 import { FontAwesome } from '@expo/vector-icons';
-
+import { ClanManagementModal } from "../../../components/clan-management";
+import type { Profile } from "@/app/lib/types";
 export default function ProfileScreen() {
   const { logout, user } = useAuth();
   const { profile, loading, error, refetch } = useUserProfile();
 
   const bottomSheetModalRef = useRef<any>(null);
+  const clanSheetRef = useRef<any>(null);
   const handlePresentModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -21,8 +23,8 @@ export default function ProfileScreen() {
   const [editBio, setEditBio] = useState("");
   const [editSlug, setEditSlug] = useState("");
   const [editWebsite, setEditWebsite] = useState("");
-  const [editGithub, setEditGithub] = useState("");
-  const [editTwitter, setEditTwitter] = useState("");
+  const [editGithubUsername, setEditGithubUsername] = useState("");
+  const [editTwitterUsername, setEditTwitterUsername] = useState("");
   const [editAvatarUrl, setEditAvatarUrl] = useState<string | null>(null);
   const [editBannerUrl, setEditBannerUrl] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState("");
@@ -34,8 +36,8 @@ export default function ProfileScreen() {
       setEditBio(profile.bio || "");
       setEditSlug(profile.slug || "");
       setEditWebsite(profile.website || "");
-      setEditGithub(profile.github || "");
-      setEditTwitter(profile.twitter || "");
+      setEditGithubUsername(profile.github ? profile.github.split('/').pop() ?? '' : '');
+      setEditTwitterUsername(profile.twitter ? profile.twitter.split('/').pop() ?? '' : '');
       setEditAvatarUrl(profile.avatar_url || null);
       setEditBannerUrl(profile.banner_url || null);
     }
@@ -133,14 +135,17 @@ export default function ProfileScreen() {
         finalBannerUrl = await uploadImage(editBannerUrl, 'banners') || finalBannerUrl;
       }
 
+      const finalGithub = editGithubUsername ? `https://github.com/${editGithubUsername}` : null;
+      const finalTwitter = editTwitterUsername ? `https://x.com/${editTwitterUsername}` : null;
+
       const updates = {
         id: user.id,
         username: editUsername,
         bio: editBio,
         slug: editSlug,
-        website: editWebsite,
-        github: editGithub,
-        twitter: editTwitter,
+        website: editWebsite || null,
+        github: finalGithub,
+        twitter: finalTwitter,
         avatar_url: finalAvatarUrl,
         banner_url: finalBannerUrl,
         updated_at: new Date().toISOString(),
@@ -169,9 +174,9 @@ export default function ProfileScreen() {
   if (error) {
     return <View className="flex-1 justify-center items-center bg-black"><Text className="text-red-500">Erro ao carregar o perfil.</Text></View>;
   }
-  
+
   if (!profile) {
-     return (
+    return (
       <View className="flex-1 justify-center items-center bg-black px-6">
         <Text className="text-white text-xl font-bold text-center mb-4">Crie seu Perfil</Text>
         <Text className="text-neutral-400 text-center mb-6">Complete seu perfil para começar sua jornada.</Text>
@@ -213,7 +218,7 @@ export default function ProfileScreen() {
             <View className="absolute inset-0 bg-gradient-to-b from-red-950 via-red-900 to-black" />
           )}
           <View className="absolute inset-0 bg-black/50" />
-          
+
           <View className="flex-1 justify-center items-center px-6 pt-16">
             <View className="w-24 h-24 rounded-full items-center justify-center mb-4 border-4 border-red-600">
               {profile.avatar_url ? (
@@ -257,13 +262,13 @@ export default function ProfileScreen() {
             </View>
 
             {/* Clan Card */}
-            <View className="flex-1 bg-black rounded-xl p-4">
+            <Pressable onPress={() => clanSheetRef.current?.present()} className="flex-1 bg-black rounded-xl p-4 active:opacity-70">
               <Text className="text-neutral-500 text-xs font-semibold mb-1">CLAN</Text>
               <Text className="text-white text-lg font-bold" numberOfLines={1}>
                 {profile.clans?.name || 'Sem Clan'}
               </Text>
               <Text className="text-neutral-600 text-xs">氏族</Text>
-            </View>
+            </Pressable>
           </View>
 
           {/* Username JP Card */}
@@ -305,7 +310,7 @@ export default function ProfileScreen() {
               <Text className="text-white font-bold text-base"> Editar Perfil</Text>
             </View>
           </Pressable>
-          
+
           <Pressable onPress={logout} className="active:opacity-70">
             <View className="bg-red-900/20 border border-red-800 rounded-xl py-3 items-center">
               <Text className="text-red-400 font-bold text-base"> Sair da Conta</Text>
@@ -330,46 +335,51 @@ export default function ProfileScreen() {
         <Text className="text-white font-bold text-lg mb-4">Informações Públicas</Text>
         <View className="mb-4">
           <Text className="text-neutral-400 mb-2">Nome de Usuário</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={editUsername} onChangeText={setEditUsername} />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={editUsername} onChangeText={setEditUsername} />
         </View>
         <View className="mb-4">
           <Text className="text-neutral-400 mb-2">Bio</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800 h-24" value={editBio} onChangeText={setEditBio} multiline textAlignVertical="top" />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900 h-24" value={editBio} onChangeText={setEditBio} multiline textAlignVertical="top" />
         </View>
         <View className="mb-6">
           <Text className="text-neutral-400 mb-2">Slug</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={editSlug} onChangeText={handleSlugChange} autoCapitalize="none" />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={editSlug} onChangeText={handleSlugChange} autoCapitalize="none" />
           <Text className="text-neutral-500 text-xs mt-2">Será formatado como URL. Apenas letras minúsculas, números e hífens.</Text>
         </View>
-        
+
         <Text className="text-white font-bold text-lg mb-4">Links Sociais</Text>
         <View className="mb-4">
           <Text className="text-neutral-400 mb-2">Website</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={editWebsite} onChangeText={setEditWebsite} placeholder="https://seu-site.com" placeholderTextColor="#666" autoCapitalize="none" keyboardType="url" />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={editWebsite} onChangeText={setEditWebsite} placeholder="https://seu-site.com" placeholderTextColor="#666" autoCapitalize="none" keyboardType="url" />
         </View>
         <View className="mb-4">
           <Text className="text-neutral-400 mb-2">GitHub</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={editGithub} onChangeText={setEditGithub} placeholder="https://github.com/usuario" placeholderTextColor="#666" autoCapitalize="none" keyboardType="url" />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={editGithubUsername} onChangeText={setEditGithubUsername} placeholder="seu-usuario" placeholderTextColor="#666" autoCapitalize="none" />
         </View>
         <View className="mb-6">
           <Text className="text-neutral-400 mb-2">Twitter / X</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={editTwitter} onChangeText={setEditTwitter} placeholder="https://x.com/usuario" placeholderTextColor="#666" autoCapitalize="none" keyboardType="url" />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={editTwitterUsername} onChangeText={setEditTwitterUsername} placeholder="seu-usuario" placeholderTextColor="#666" autoCapitalize="none" />
         </View>
 
         <Text className="text-white font-bold text-lg mb-4">Informações Privadas</Text>
         <View className="mb-4">
           <Text className="text-neutral-400 mb-2">Novo E-mail</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={newEmail} onChangeText={setNewEmail} placeholder={user?.email} placeholderTextColor="#666" keyboardType="email-address" autoCapitalize="none" />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={newEmail} onChangeText={setNewEmail} placeholder={user?.email} placeholderTextColor="#666" keyboardType="email-address" autoCapitalize="none" />
         </View>
         <View className="mb-6">
           <Text className="text-neutral-400 mb-2">Nova Senha</Text>
-          <TextInput className="bg-neutral-900 text-white p-3 rounded-lg border border-neutral-800" value={newPassword} onChangeText={setNewPassword} placeholder="Deixe em branco para não alterar" placeholderTextColor="#666" secureTextEntry />
+          <TextInput className="bg-black text-white p-3 rounded-lg border border-zinc-900" value={newPassword} onChangeText={setNewPassword} placeholder="Deixe em branco para não alterar" placeholderTextColor="#666" secureTextEntry />
         </View>
 
-        <Pressable onPress={handleSave} className="p-4 bg-red-600 rounded-lg items-center mb-4">
-          <Text className="text-white font-bold text-lg">Salvar Alterações</Text>
+        <Pressable onPress={handleSave} className="p-3  bg-red-600 rounded-lg items-center mb-4">
+          <Text className="text-white font-bold text-sm">Salvar Alterações</Text>
         </Pressable>
       </AppBottomSheet>
+      <ClanManagementModal
+        ref={clanSheetRef}
+        profile={profile as Profile}
+        refetchProfile={refetch}
+      />
     </>
   );
 }

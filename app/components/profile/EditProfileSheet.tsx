@@ -1,10 +1,11 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect, forwardRef, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { AppBottomSheet } from '@/components/ui/bottom-sheet';
 import { CustomButton } from '@/components/ui/custom-button';
 import { ImageUpload } from './ImageUpload';
 import { ProfileForm } from './ProfileForm';
+import { EditJapaneseNameSheet } from './EditJapaneseNameSheet'; // Import the new sheet
 import { supabase } from '@/app/lib/supabase';
 import type { Profile } from '@/app/lib/types';
 import type { User } from '@supabase/supabase-js';
@@ -29,6 +30,8 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
   const [saving, setSaving] = useState(false);
   const [editJapaneseName, setEditJapaneseName] = useState<string[]>([]);
 
+  const japaneseNameSheetRef = useRef<any>(null); // Ref for the new sheet
+
   useEffect(() => {
     if (profile) {
       setEditUsername(profile.username || '');
@@ -43,6 +46,14 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
     }
   }, [profile]);
 
+  const handlePresentJapaneseNameModal = useCallback(() => {
+    japaneseNameSheetRef.current?.present();
+  }, []);
+
+  const handleSaveJapaneseName = (newName: string[]) => {
+    setEditJapaneseName(newName);
+  };
+
   const handlePickImage = async (type: 'avatar' | 'banner') => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -51,7 +62,7 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'livePhotos',
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: type === 'avatar' ? [1, 1] : [16, 9],
       quality: 0.7,
@@ -171,45 +182,53 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
   };
 
   return (
-    <AppBottomSheet 
-      ref={ref} 
-      title="Edição de Perfil" 
-      titleJP="プロファイル編集"
-    >
-      <ImageUpload
-        onPickImage={handlePickImage}
-        avatarUrl={editAvatarUrl}
-        bannerUrl={editBannerUrl}
+    <>
+      <AppBottomSheet 
+        ref={ref} 
+        title="Edição de Perfil" 
+        titleJP="プロファイル編集"
+        isLoading={saving} // Pass isLoading prop here
+      >
+        <ImageUpload
+          onPickImage={handlePickImage}
+          avatarUrl={editAvatarUrl}
+          bannerUrl={editBannerUrl}
+        />
+        <ProfileForm
+          user={user}
+          username={editUsername}
+          setUsername={setEditUsername}
+          bio={editBio}
+          setBio={setEditBio}
+          slug={editSlug}
+          handleSlugChange={handleSlugChange}
+          website={editWebsite}
+          setWebsite={setEditWebsite}
+          githubUsername={editGithubUsername}
+          setGithubUsername={setEditGithubUsername}
+          twitterUsername={editTwitterUsername}
+          setTwitterUsername={setEditTwitterUsername}
+          newEmail={newEmail}
+          setNewEmail={setNewEmail}
+          newPassword={newPassword}
+          setNewPassword={setNewPassword}
+          japaneseName={editJapaneseName}
+          onEditJapaneseName={handlePresentJapaneseNameModal} // Pass the handler
+        />
+        <CustomButton
+          title="Salvar Alterações"
+          onPress={handleSave}
+          isLoading={saving}
+          className="w-full bg-red-900/20 border py-3 rounded-sm mb-12 border-red-800"
+          textClassName="text-sm text-zinc-50 font-bold"
+        />
+      </AppBottomSheet>
+      <EditJapaneseNameSheet
+        ref={japaneseNameSheetRef}
+        initialName={editJapaneseName}
+        onSave={handleSaveJapaneseName}
       />
-      <ProfileForm
-        user={user}
-        username={editUsername}
-        setUsername={setEditUsername}
-        bio={editBio}
-        setBio={setEditBio}
-        slug={editSlug}
-        handleSlugChange={handleSlugChange}
-        website={editWebsite}
-        setWebsite={setEditWebsite}
-        githubUsername={editGithubUsername}
-        setGithubUsername={setEditGithubUsername}
-        twitterUsername={editTwitterUsername}
-        setTwitterUsername={setEditTwitterUsername}
-        newEmail={newEmail}
-        setNewEmail={setNewEmail}
-        newPassword={newPassword}
-        setNewPassword={setNewPassword}
-        japaneseName={editJapaneseName}
-        setJapaneseName={setEditJapaneseName}
-      />
-      <CustomButton
-        title="Salvar Alterações"
-        onPress={handleSave}
-        isLoading={saving}
-        className="w-full bg-red-900/20 border py-3 rounded-sm mb-12 border-red-800"
-        textClassName="text-sm text-zinc-50 font-bold"
-      />
-    </AppBottomSheet>
+    </>
   );
 });
 

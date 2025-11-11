@@ -1,12 +1,12 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
+import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { AppBottomSheet } from './ui/bottom-sheet';
 import { useClanManagement, ClanManagementView } from '../app/hooks/use-clan-management';
 import { Profile } from '../app/lib/types';
 import { CustomButton } from './ui/custom-button';
 import { KanjiLoader } from './ui/kanji-loader';
-import KanjiDictionary from './ui/KanjiDictionary';
+import { EditClanEmblemSheet } from '../app/components/clan/EditClanEmblemSheet';
 
 // Separate FormFields component to prevent re-renders
 type FormFieldsProps = {
@@ -17,26 +17,16 @@ type FormFieldsProps = {
   tag: string;
   setTag: (tag: string) => void;
   emblem: string[];
-  setEmblem: (emblem: string[]) => void;
+  onEditEmblem: () => void;
   avatarUrl: string | null;
   bannerUrl: string | null;
   handlePickImage: (type: 'avatar' | 'banner') => Promise<void>;
 };
 
 const FormFields = ({
-  name, setName, description, setDescription, tag, setTag, emblem, setEmblem,
+  name, setName, description, setDescription, tag, setTag, emblem, onEditEmblem,
   avatarUrl, bannerUrl, handlePickImage
 }: FormFieldsProps) => {
-  const handleKanjiSelect = (kanji: string) => {
-    if (emblem.length < 5) {
-      setEmblem([...emblem, kanji]);
-    }
-  };
-
-  const clearEmblem = () => {
-    setEmblem([]);
-  };
-
   return (
     <>
       <Text style={styles.formLabel}>Imagens do Clã</Text>
@@ -66,20 +56,23 @@ const FormFields = ({
         />
       </View>
       <View className="mb-4">
-        <Text style={styles.formLabel}>Emblema do Clã</Text>
-        <View className="bg-black p-3 rounded-lg border border-zinc-900 flex-row justify-center items-center min-h-[50px]">
-          {emblem.map((kanji, index) => (
-            <Text key={index} className="text-white text-2xl">
-              {kanji}
-            </Text>
-          ))}
+        <View className="flex-row justify-between items-center mb-2">
+          <Text style={styles.formLabel}>Emblema do Clã</Text>
+          <Pressable onPress={onEditEmblem} className="active:opacity-70">
+            <Text className="text-blue-500">Editar</Text>
+          </Pressable>
         </View>
-        <TouchableOpacity onPress={clearEmblem}>
-          <Text className="text-red-500 text-xs mt-2 text-right">Limpar</Text>
-        </TouchableOpacity>
-      </View>
-      <View className="mb-4">
-        <KanjiDictionary onSelect={handleKanjiSelect} selectedKanji={emblem} />
+        <View className="bg-black p-3 rounded-lg border border-zinc-900 flex-row justify-center items-center min-h-[50px]">
+          {emblem.length > 0 ? (
+            emblem.map((kanji, index) => (
+              <Text key={index} className="text-white text-2xl">
+                {kanji}
+              </Text>
+            ))
+          ) : (
+            <Text className="text-neutral-500">Nenhum</Text>
+          )}
+        </View>
       </View>
     </>
   );
@@ -93,6 +86,7 @@ type Props = {
 
 export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchProfile }, ref) => {
   const bottomSheetRef = useRef<any>(null);
+  const emblemSheetRef = useRef<any>(null);
 
   const {
     view, clans, loading, name, setName, description, setDescription, tag, setTag, emblem, setEmblem, avatarUrl, bannerUrl,
@@ -107,6 +101,14 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
     },
     dismiss: () => bottomSheetRef.current?.dismiss(),
   }));
+
+  const handlePresentEmblemModal = useCallback(() => {
+    emblemSheetRef.current?.present();
+  }, []);
+
+  const handleSaveEmblem = (newEmblem: string[]) => {
+    setEmblem(newEmblem);
+  };
 
   const renderContent = () => {
     if (!profile) return <View />;
@@ -166,7 +168,7 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
                 name={name} setName={setName}
                 description={description} setDescription={setDescription}
                 tag={tag} setTag={setTag}
-                emblem={emblem} setEmblem={setEmblem}
+                emblem={emblem} onEditEmblem={handlePresentEmblemModal}
                 avatarUrl={avatarUrl} bannerUrl={bannerUrl}
                 handlePickImage={handlePickImage}
               />
@@ -227,7 +229,7 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
                 name={name} setName={setName}
                 description={description} setDescription={setDescription}
                 tag={tag} setTag={setTag}
-                emblem={emblem} setEmblem={setEmblem}
+                emblem={emblem} onEditEmblem={handlePresentEmblemModal}
                 avatarUrl={avatarUrl} bannerUrl={bannerUrl}
                 handlePickImage={handlePickImage}
               />
@@ -247,9 +249,16 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
   };
 
   return (
-    <AppBottomSheet ref={bottomSheetRef} title={headerTitle} titleJP={headerJpTitle}>
-      {renderContent()}
-    </AppBottomSheet>
+    <>
+      <AppBottomSheet ref={bottomSheetRef} title={headerTitle} titleJP={headerJpTitle} isLoading={loading}>
+        {renderContent()}
+      </AppBottomSheet>
+      <EditClanEmblemSheet
+        ref={emblemSheetRef}
+        initialEmblem={emblem}
+        onSave={handleSaveEmblem}
+      />
+    </>
   );
 });
 

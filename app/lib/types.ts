@@ -40,3 +40,40 @@ export type Profile = {
   joined_date?: string;
   username_jp?: string;
 };
+
+export type Territory = {
+  id: string;
+  clan_id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  district_id: string | null;
+};
+
+export type Mission = {
+  id: string;
+  territory_id: string;
+  name: string;
+  description: string | null;
+  reward: any; // JSONB
+  created_at: string;
+  updated_at: string;
+};
+
+export type District = {
+  id: string;
+  name: string;
+  map_coordinates: { x: number; y: number; };
+  created_at: string;
+};
+
+export type GameEvent = {
+  id: number;
+  event_type: string;
+  description: string;
+  clan_id: string | null;
+  territory_id: string | null;
+  metadata: any; // JSONB
+  created_at: string;
+};

@@ -34,7 +34,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
       ) : (
         <View className="absolute inset-0 bg-gradient-to-b from-red-950 via-red-900 to-black" />
       )}
-      <View className="absolute inset-0 bg-black/50" />
+      <View className="absolute bottom-0 inset-0 bg-black/60" />
 
       <View className="flex-1 justify-center items-center px-6 pt-16">
         <View className="w-24 h-24 rounded-full items-center justify-center mb-4 border-4 border-red-600">
@@ -52,6 +52,10 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
         </View>
         <SocialLinks profile={profile} />
       </View>
+
+ 
+      <View className="absolute left-0 top-40 w-1 h-32 bg-red-600" />
+      <View className="absolute right-0 top-40 w-1 h-32 bg-red-600" />
     </View>
   );
 }

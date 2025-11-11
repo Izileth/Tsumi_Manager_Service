@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KanjiLoader } from './kanji-loader'; // Import KanjiLoader
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DEFAULT_SNAP_POINT = SCREEN_HEIGHT * 0.95; // 95% of screen height
@@ -23,10 +24,11 @@ type AppBottomSheetProps = {
   snapPoints?: (string | number)[]; // Not used in custom implementation, but kept for compatibility
   onDismiss?: () => void;
   enablePanDownToClose?: boolean; // Nova prop para controlar se pode fechar
+  isLoading?: boolean; // New prop for loading state
 };
 
 export const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
-  ({ title, titleJP, children, onDismiss, enablePanDownToClose = true }, ref) => {
+  ({ title, titleJP, children, onDismiss, enablePanDownToClose = true, isLoading = false }, ref) => {
     const insets = useSafeAreaInsets();
     const [isVisible, setIsVisible] = useState(false);
     const [contentVisible, setContentVisible] = useState(false);
@@ -151,7 +153,13 @@ export const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
                   contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 20 }}
                   showsVerticalScrollIndicator={false}
                 >
-                  {contentVisible && children}
+                  {isLoading ? (
+                    <View className="flex-1 justify-center items-center p-8">
+                      <KanjiLoader />
+                    </View>
+                  ) : (
+                    contentVisible && children
+                  )}
                 </ScrollView>
               </Animated.View>
             </Pressable>

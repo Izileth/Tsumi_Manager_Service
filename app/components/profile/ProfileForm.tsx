@@ -1,6 +1,5 @@
-import { Text, TextInput, View, TouchableOpacity } from 'react-native';
+import { Text, TextInput, View, Pressable } from 'react-native';
 import type { User } from '@supabase/supabase-js';
-import KanjiDictionary from '@/components/ui/KanjiDictionary';
 
 type ProfileFormProps = {
   user: User | null;
@@ -21,7 +20,7 @@ type ProfileFormProps = {
   newPassword: string;
   setNewPassword: (value: string) => void;
   japaneseName: string[];
-  setJapaneseName: (value: string[]) => void;
+  onEditJapaneseName: () => void;
 };
 
 export function ProfileForm({
@@ -43,18 +42,8 @@ export function ProfileForm({
   newPassword,
   setNewPassword,
   japaneseName,
-  setJapaneseName,
+  onEditJapaneseName,
 }: ProfileFormProps) {
-  const handleKanjiSelect = (kanji: string) => {
-    if (japaneseName.length < 5) {
-      setJapaneseName([...japaneseName, kanji]);
-    }
-  };
-
-  const clearJapaneseName = () => {
-    setJapaneseName([]);
-  };
-
   return (
     <>
       <Text className="text-white font-bold text-lg mb-4">Informações Públicas</Text>
@@ -67,20 +56,23 @@ export function ProfileForm({
         />
       </View>
       <View className="mb-4">
-        <Text className="text-neutral-400 mb-2">Nome Japonês</Text>
-        <View className="bg-black p-3 rounded-lg border border-zinc-900 flex-row justify-center items-center min-h-[50px]">
-          {japaneseName.map((kanji, index) => (
-            <Text key={index} className="text-white text-2xl">
-              {kanji}
-            </Text>
-          ))}
+        <View className="flex-row justify-between items-center mb-2">
+          <Text className="text-neutral-400">Nome Japonês</Text>
+          <Pressable onPress={onEditJapaneseName} className="active:opacity-70">
+            <Text className="text-blue-500">Editar</Text>
+          </Pressable>
         </View>
-        <TouchableOpacity onPress={clearJapaneseName}>
-          <Text className="text-red-500 text-xs mt-2 text-right">Limpar</Text>
-        </TouchableOpacity>
-      </View>
-      <View className="mb-4">
-        <KanjiDictionary onSelect={handleKanjiSelect} selectedKanji={japaneseName} />
+        <View className="bg-black p-3 rounded-lg border border-zinc-900 flex-row justify-center items-center min-h-[50px]">
+          {japaneseName.length > 0 ? (
+            japaneseName.map((kanji, index) => (
+              <Text key={index} className="text-white text-2xl">
+                {kanji}
+              </Text>
+            ))
+          ) : (
+            <Text className="text-neutral-500">Nenhum</Text>
+          )}
+        </View>
       </View>
       <View className="mb-4">
         <Text className="text-neutral-400 mb-2">Bio</Text>

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useState } from "react";
 import { useExploreData } from "@/app/hooks/useExploreData";
 import { KanjiLoader } from "@/components/ui/kanji-loader";
@@ -6,13 +6,34 @@ import { Dashboard } from "@/app/components/explore/Dashboard";
 import { TerritoryMap } from "@/app/components/explore/TerritoryMap";
 import { ClansList } from "@/app/components/explore/ClansList";
 import { TerritoriesList } from "@/app/components/explore/TerritoriesList";
+import { GenericTabs, Tab } from "@/components/ui/GenericTabs";
+
+type ExploreTab = 'dashboard' | 'map' | 'clans' | 'territories';
+
+const exploreTabs: Tab<ExploreTab>[] = [
+  { label: 'Dashboard', value: 'dashboard' },
+  { label: 'Mapa', value: 'map' },
+  { label: 'Clãs', value: 'clans' },
+  { label: 'Territórios', value: 'territories' },
+];
 
 export default function ExploreScreen() {
-  const [expandedSection, setExpandedSection] = useState<string | null>('dashboard');
+  const [selectedTab, setSelectedTab] = useState<ExploreTab>('dashboard');
   const { clans, territories, events, districts, loading } = useExploreData();
 
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
+  const renderContent = () => {
+    switch (selectedTab) {
+      case 'dashboard':
+        return <Dashboard events={events} clans={clans} territories={territories} />;
+      case 'map':
+        return <TerritoryMap districts={districts} territories={territories} />;
+      case 'clans':
+        return <ClansList clans={clans} />;
+      case 'territories':
+        return <TerritoriesList territories={territories} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -41,48 +62,20 @@ export default function ExploreScreen() {
       </View>
 
       <View className="px-6 pt-8">
+        <GenericTabs
+          tabs={exploreTabs}
+          selectedTab={selectedTab}
+          onTabPress={setSelectedTab}
+        />
+
         {loading ? (
           <View className="flex-1 justify-center items-center p-8">
             <KanjiLoader />
           </View>
         ) : (
-          <>
-            {/* SEÇÃO: Dashboard */}
-            <CollapsibleSection
-              title="Dashboard do Submundo"
-              isExpanded={expandedSection === "dashboard"}
-              onToggle={() => toggleSection("dashboard")}
-            >
-              <Dashboard events={events} clans={clans} territories={territories} />
-            </CollapsibleSection>
-
-            {/* SEÇÃO: Mapa de Territórios */}
-            <CollapsibleSection
-              title="Mapa de Territórios"
-              isExpanded={expandedSection === "map"}
-              onToggle={() => toggleSection("map")}
-            >
-              <TerritoryMap districts={districts} territories={territories} />
-            </CollapsibleSection>
-
-            {/* SEÇÃO: Clãs */}
-            <CollapsibleSection
-              title="Clãs em Atividade"
-              isExpanded={expandedSection === "clans"}
-              onToggle={() => toggleSection("clans")}
-            >
-              <ClansList clans={clans} />
-            </CollapsibleSection>
-
-            {/* SEÇÃO: Lista de Territórios */}
-            <CollapsibleSection
-              title="Lista de Territórios"
-              isExpanded={expandedSection === "territories"}
-              onToggle={() => toggleSection("territories")}
-            >
-              <TerritoriesList territories={territories} />
-            </CollapsibleSection>
-          </>
+          <View>
+            {renderContent()}
+          </View>
         )}
 
         {/* Footer */}
@@ -98,40 +91,5 @@ export default function ExploreScreen() {
         </View>
       </View>
     </ScrollView>
-  );
-}
-
-// COMPONENTE: Seção Colapsável
-function CollapsibleSection({ 
-  title, 
-  isExpanded, 
-  onToggle, 
-  children 
-}: { 
-  title: string;
-  isExpanded: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <View className="mb-6">
-      <Pressable 
-        onPress={onToggle}
-        className="active:opacity-70"
-      >
-        <View className="flex-row items-center justify-between bg-black p-4 rounded-lg border border-zinc-950">
-          <Text className="text-white font-bold text-base">{title}</Text>
-          <Text className="text-red-500 text-xl">
-            {isExpanded ? "−" : "+"}
-          </Text>
-        </View>
-      </Pressable>
-      
-      {isExpanded && (
-        <View className="bg-black border-x border-b border-zinc-950 rounded-b-lg p-4 -mt-1">
-          {children}
-        </View>
-      )}
-    </View>
   );
 }

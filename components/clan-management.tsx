@@ -6,7 +6,7 @@ import { useClanManagement, ClanManagementView } from '../app/hooks/use-clan-man
 import { Profile } from '../app/lib/types';
 import { CustomButton } from './ui/custom-button';
 import { KanjiLoader } from './ui/kanji-loader';
-import { EditClanEmblemSheet } from '../app/components/clan/EditClanEmblemSheet';
+import { ClanEmblemEditor } from '../app/components/clan/ClanEmblemEditor';
 
 // Separate FormFields component to prevent re-renders
 type FormFieldsProps = {
@@ -86,7 +86,6 @@ type Props = {
 
 export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchProfile }, ref) => {
   const bottomSheetRef = useRef<any>(null);
-  const emblemSheetRef = useRef<any>(null);
 
   const {
     view, clans, loading, name, setName, description, setDescription, tag, setTag, emblem, setEmblem, avatarUrl, bannerUrl,
@@ -102,13 +101,9 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
     dismiss: () => bottomSheetRef.current?.dismiss(),
   }));
 
-  const handlePresentEmblemModal = useCallback(() => {
-    emblemSheetRef.current?.present();
-  }, []);
-
-  const handleSaveEmblem = (newEmblem: string[]) => {
-    setEmblem(newEmblem);
-  };
+  const handleEditEmblem = useCallback(() => {
+    handleSetView('edit-emblem', 'Editar Emblema', '紋章を編集');
+  }, [handleSetView]);
 
   const renderContent = () => {
     if (!profile) return <View />;
@@ -168,7 +163,7 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
                 name={name} setName={setName}
                 description={description} setDescription={setDescription}
                 tag={tag} setTag={setTag}
-                emblem={emblem} onEditEmblem={handlePresentEmblemModal}
+                emblem={emblem} onEditEmblem={handleEditEmblem}
                 avatarUrl={avatarUrl} bannerUrl={bannerUrl}
                 handlePickImage={handlePickImage}
               />
@@ -229,7 +224,7 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
                 name={name} setName={setName}
                 description={description} setDescription={setDescription}
                 tag={tag} setTag={setTag}
-                emblem={emblem} onEditEmblem={handlePresentEmblemModal}
+                emblem={emblem} onEditEmblem={handleEditEmblem}
                 avatarUrl={avatarUrl} bannerUrl={bannerUrl}
                 handlePickImage={handlePickImage}
               />
@@ -243,22 +238,33 @@ export const ClanManagementModal = forwardRef<any, Props>(({ profile, refetchPro
             </ScrollView>
           </>
         );
+      case 'edit-emblem':
+        const cameFromCreate = !profile.clans;
+        const previousView = cameFromCreate ? 'create' : 'edit';
+        const previousTitle = cameFromCreate ? 'Criar Novo Clã' : 'Editar Clã';
+        const previousJpTitle = cameFromCreate ? '新しい氏族を作成' : '氏族を編集';
+
+        return (
+          <>
+            <BackButton view={previousView} title={previousTitle} jpTitle={previousJpTitle} />
+            <ClanEmblemEditor
+              initialEmblem={emblem}
+              onSave={(newEmblem) => {
+                setEmblem(newEmblem);
+                handleSetView(previousView, previousTitle, previousJpTitle);
+              }}
+            />
+          </>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <>
-      <AppBottomSheet ref={bottomSheetRef} title={headerTitle} titleJP={headerJpTitle} isLoading={loading}>
-        {renderContent()}
-      </AppBottomSheet>
-      <EditClanEmblemSheet
-        ref={emblemSheetRef}
-        initialEmblem={emblem}
-        onSave={handleSaveEmblem}
-      />
-    </>
+    <AppBottomSheet ref={bottomSheetRef} title={headerTitle} titleJP={headerJpTitle} >
+      {renderContent()}
+    </AppBottomSheet>
   );
 });
 

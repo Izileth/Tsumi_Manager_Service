@@ -1,4 +1,4 @@
-import { Text, TextInput, View, Pressable } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import type { User } from '@supabase/supabase-js';
 
 type ProfileFormProps = {
@@ -18,9 +18,8 @@ type ProfileFormProps = {
   newEmail: string;
   setNewEmail: (value: string) => void;
   newPassword: string;
+    japaneseName: string;
   setNewPassword: (value: string) => void;
-  japaneseName: string[];
-  onEditJapaneseName: () => void;
 };
 
 export function ProfileForm({
@@ -41,8 +40,6 @@ export function ProfileForm({
   setNewEmail,
   newPassword,
   setNewPassword,
-  japaneseName,
-  onEditJapaneseName,
 }: ProfileFormProps) {
   return (
     <>
@@ -54,25 +51,6 @@ export function ProfileForm({
           value={username}
           onChangeText={setUsername}
         />
-      </View>
-      <View className="mb-4">
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-neutral-400">Nome Japonês</Text>
-          <Pressable onPress={onEditJapaneseName} className="active:opacity-70">
-            <Text className="text-blue-500">Editar</Text>
-          </Pressable>
-        </View>
-        <View className="bg-black p-3 rounded-lg border border-zinc-900 flex-row justify-center items-center min-h-[50px]">
-          {japaneseName.length > 0 ? (
-            japaneseName.map((kanji, index) => (
-              <Text key={index} className="text-white text-2xl">
-                {kanji}
-              </Text>
-            ))
-          ) : (
-            <Text className="text-neutral-500">Nenhum</Text>
-          )}
-        </View>
       </View>
       <View className="mb-4">
         <Text className="text-neutral-400 mb-2">Bio</Text>

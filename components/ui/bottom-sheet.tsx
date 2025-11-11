@@ -12,7 +12,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { KanjiLoader } from './kanji-loader'; // Import KanjiLoader
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DEFAULT_SNAP_POINT = SCREEN_HEIGHT * 0.95; // 95% of screen height
@@ -23,15 +22,12 @@ type AppBottomSheetProps = {
   children: React.ReactNode;
   snapPoints?: (string | number)[]; // Not used in custom implementation, but kept for compatibility
   onDismiss?: () => void;
-  enablePanDownToClose?: boolean; // Nova prop para controlar se pode fechar
-  isLoading?: boolean; // New prop for loading state
 };
 
 export const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
-  ({ title, titleJP, children, onDismiss, enablePanDownToClose = true, isLoading = false }, ref) => {
+  ({ title, titleJP, children, onDismiss }, ref) => {
     const insets = useSafeAreaInsets();
     const [isVisible, setIsVisible] = useState(false);
-    const [contentVisible, setContentVisible] = useState(false);
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
     const currentHeight = useRef(DEFAULT_SNAP_POINT); // Track current height for PanResponder
 
@@ -42,13 +38,10 @@ export const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
         damping: 15,
         stiffness: 100,
         useNativeDriver: true,
-      }).start(() => {
-        setContentVisible(true);
-      });
+      }).start();
     }, [translateY]);
 
     const animateClose = useCallback(() => {
-      setContentVisible(false);
       Animated.timing(translateY, {
         toValue: SCREEN_HEIGHT,
         duration: 300,
@@ -78,7 +71,7 @@ export const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
           }
         },
         onPanResponderRelease: (_, gestureState) => {
-          if (enablePanDownToClose && gestureState.dy > 50) { // If dragged down more than 50 pixels
+          if (gestureState.dy > 50) { // If dragged down more than 50 pixels
             animateClose();
           } else {
             // Snap back to open position
@@ -97,72 +90,61 @@ export const AppBottomSheet = forwardRef<any, AppBottomSheetProps>(
 
     return (
       <Modal transparent visible={isVisible} onRequestClose={animateClose}>
-        {/* Backdrop - apenas o fundo escuro deve fechar */}
-        <Pressable 
-          className="flex-1 bg-black/50" 
-          onPress={enablePanDownToClose ? animateClose : undefined}
-          style={{ flex: 1 }}
-        >
+        <Pressable className="flex-1" onPress={animateClose}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1, justifyContent: 'flex-end' }}
+            style={{ flex: 1 }}
           >
-            {/* Pressable para prevenir propagação do toque */}
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <Animated.View
-                style={{
-                  transform: [{ translateY }],
-                  width: '100%',
-                  height: DEFAULT_SNAP_POINT + insets.bottom,
-                  backgroundColor: '#000000',
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  overflow: 'hidden',
-                }}
-                {...panResponder.panHandlers}
-              >
-                {/* Handle Indicator */}
-                <View className="w-full items-center py-3">
-                  <View className="w-16 h-1.5 bg-neutral-700 rounded-full" />
-                </View>
+            <Animated.View
+              style={{
+                transform: [{ translateY }],
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%', // Full width
+                height: DEFAULT_SNAP_POINT + insets.bottom, // Adjust height for safe area
+                backgroundColor: '#000000',
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                overflow: 'hidden',
+              }}
+              {...panResponder.panHandlers}
+            >
+              {/* Handle Indicator */}
+              <View className="w-full items-center py-3">
+                <View className="w-16 h-1.5 bg-black rounded-full" />
+              </View>
 
-                {/* Header */}
-                {(title || titleJP) && (
-                  <View className="border-b border-neutral-800 px-6 pt-4 pb-4">
-                    {titleJP && (
-                      <Text className="text-red-500 text-2xl font-black tracking-wider text-center mb-1">
-                        {titleJP}
-                      </Text>
-                    )}
-                    {title && (
-                      <Text className="text-white text-lg font-semibold text-center">
-                        {title}
-                      </Text>
-                    )}
-                    <View className="flex-row justify-center items-center gap-2 mt-3">
-                      <View className="w-8 h-px bg-red-600" />
-                      <Text className="text-neutral-700 text-xs">龍</Text>
-                      <View className="w-8 h-px bg-red-600" />
-                    </View>
-                  </View>
-                )}
-
-                {/* Content */}
-                <ScrollView
-                  style={{ flex: 1 }}
-                  contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 20 }}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {isLoading ? (
-                    <View className="flex-1 justify-center items-center p-8">
-                      <KanjiLoader />
-                    </View>
-                  ) : (
-                    contentVisible && children
+              {/* Header */}
+              {(title || titleJP) && (
+                <View className="border-b border-neutral-800 px-6 pt-4 pb-4">
+                  {titleJP && (
+                    <Text className="text-red-500 text-2xl font-black tracking-wider text-center mb-1">
+                      {titleJP}
+                    </Text>
                   )}
-                </ScrollView>
-              </Animated.View>
-            </Pressable>
+                  {title && (
+                    <Text className="text-white text-lg font-semibold text-center">
+                      {title}
+                    </Text>
+                  )}
+                  <View className="flex-row justify-center items-center gap-2 mt-3">
+                    <View className="w-8 h-px bg-red-600" />
+                    <Text className="text-neutral-700 text-xs">龍</Text>
+                    <View className="w-8 h-px bg-red-600" />
+                  </View>
+                </View>
+              )}
+
+              {/* Content */}
+              <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: insets.bottom + 20 }}
+              >
+                {children}
+              </ScrollView>
+            </Animated.View>
           </KeyboardAvoidingView>
         </Pressable>
       </Modal>

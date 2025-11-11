@@ -26,11 +26,11 @@ export function ClansList({ clans }: ClansListProps) {
             <Text className="text-white font-bold text-base">{clan.name} [{clan.tag}]</Text>
             <View className="flex-row gap-4 mt-1">
               <View className="flex-row items-center gap-1">
-                <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                    <Text className="text-zinc-400  text-xs">力</Text>
                 <Text className="text-neutral-400 text-xs">{clan.power || 0}</Text>
               </View>
               <View className="flex-row items-center gap-1">
-                <FontAwesome name="shield" size={12} color="#3b82f6" />
+                    <Text className="text-zinc-400 text-xs">名声</Text>
                 <Text className="text-neutral-400 text-xs">{clan.reputation || 0}</Text>
               </View>
             </View>

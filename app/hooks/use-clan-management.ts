@@ -5,7 +5,7 @@ import { useAuth } from '../context/auth-context';
 import { Clan, Profile } from '../lib/types';
 import * as ImagePicker from 'expo-image-picker';
 
-export type ClanManagementView = 'main' | 'join' | 'create' | 'manage' | 'edit';
+export type ClanManagementView = 'main' | 'join' | 'create' | 'manage' | 'edit' | 'edit-emblem';
 
 export const useClanManagement = (profile: Profile | null | undefined, refetchProfile: () => void, onDismiss: () => void) => {
   const { user } = useAuth();

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { ScrollView, Text, View} from "react-native";
+import { ScrollView, Text, View, Alert } from "react-native";
 import { useAuth } from '@/app/context/auth-context';
 import { useUserProfile } from '@/app/hooks/useUserProfile';
 import { ClanManagementModal } from '@/components/clan-management';
@@ -9,12 +9,18 @@ import { ProfileHeader } from "@/app/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/app/components/profile/ProfileInfo";
 import { EditProfileSheet } from "@/app/components/profile/EditProfileSheet";
 import { KanjiLoader } from "@/components/ui/kanji-loader";
+import { EditJapaneseNameSheet } from "@/app/components/profile/EditJapaneseNameSheet";
+import { EditClanEmblemSheet } from "@/app/components/profile/EditClanEmblemSheet";
+import { supabase } from "@/app/lib/supabase";
+
 export default function ProfileScreen() {
   const { logout, user } = useAuth();
   const { profile, loading, error, refetch } = useUserProfile();
 
   const bottomSheetModalRef = useRef<any>(null);
   const clanSheetRef = useRef<any>(null);
+  const editJapaneseNameSheetRef = useRef<any>(null);
+  const editClanEmblemSheetRef = useRef<any>(null);
 
   const handlePresentModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -23,6 +29,47 @@ export default function ProfileScreen() {
   const handlePresentClanModal = useCallback(() => {
     clanSheetRef.current?.present();
   }, []);
+
+  const handlePresentJapaneseNameModal = useCallback(() => {
+    editJapaneseNameSheetRef.current?.present(profile?.username_jp);
+  }, [profile]);
+
+  const handlePresentClanEmblemModal = useCallback(() => {
+    editClanEmblemSheetRef.current?.present(profile?.clans?.emblem);
+  }, [profile]);
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+      if (error) throw error;
+      await refetch();
+    } catch (error: any) {
+      Alert.alert('Erro', 'Não foi possível atualizar o perfil.');
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleSaveJapaneseName = async (name: string) => {
+    await updateProfile({ username_jp: name });
+    editJapaneseNameSheetRef.current?.dismiss();
+  };
+
+  const handleSaveClanEmblem = async (emblem: string[]) => {
+    if (!profile?.clan_id) return;
+    try {
+      const emblemString = emblem.join('');
+      const { error } = await supabase
+        .from('clans')
+        .update({ emblem: emblemString })
+        .eq('id', profile.clan_id);
+      if (error) throw error;
+      await refetch();
+    } catch (error: any) {
+      Alert.alert('Erro', 'Não foi possível atualizar o emblema do clã.');
+      console.error('Error updating clan emblem:', error);
+    }
+  };
 
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -54,7 +101,12 @@ export default function ProfileScreen() {
     <>
       <ScrollView className="flex-1 bg-black">
         <ProfileHeader profile={profile} />
-        <ProfileInfo profile={profile} onClanPress={handlePresentClanModal} />
+        <ProfileInfo
+          profile={profile}
+          onClanPress={handlePresentClanModal}
+          onEditJapaneseNamePress={handlePresentJapaneseNameModal}
+          onEditClanEmblemPress={handlePresentClanEmblemModal}
+        />
 
         {/* ACTION BUTTONS */}
         <View className="px-6 pb-6">
@@ -79,6 +131,14 @@ export default function ProfileScreen() {
         ref={clanSheetRef}
         profile={profile as Profile}
         refetchProfile={refetch}
+      />
+      <EditJapaneseNameSheet
+        ref={editJapaneseNameSheetRef}
+        onSave={handleSaveJapaneseName}
+      />
+      <EditClanEmblemSheet
+        ref={editClanEmblemSheetRef}
+        onSave={handleSaveClanEmblem}
       />
     </>
   );

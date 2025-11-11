@@ -187,7 +187,6 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
         ref={ref} 
         title="Edição de Perfil" 
         titleJP="プロファイル編集"
-        isLoading={saving} // Pass isLoading prop here
       >
         <ImageUpload
           onPickImage={handlePickImage}

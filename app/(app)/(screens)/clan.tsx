@@ -1,39 +1,31 @@
-import { View, Text, ScrollView, Pressable, Image } from "react-native";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { View, Text, ScrollView } from "react-native";
+import { useState, useRef } from "react";
 import { useUserProfile } from "@/app/hooks/useUserProfile";
-import { useClanManagement } from "@/app/hooks/use-clan-management";
 import { useClanAssets } from "@/app/hooks/useClanAssets";
-import { supabase } from "@/app/lib/supabase";
+import { useClanMembers } from "@/app/hooks/useClanMembers";
 import { Territory, Mission } from "@/app/lib/types";
 
-import { CustomTabs } from "@/components/ui/custom-tabs";
+import { GenericTabs, Tab } from "@/components/ui/GenericTabs";
 import { AddTerritorySheet } from "@/app/components/clan/AddTerritorySheet";
 import { AddMissionSheet } from "@/app/components/clan/AddMissionSheet";
 import { EditTerritorySheet } from "@/app/components/clan/EditTerritorySheet";
-import { KanjiLoader } from "@/components/ui/kanji-loader";
 import { EditMissionSheet } from "@/app/components/clan/EditMissionSheet";
+import { MembersTab } from "@/app/components/clan/tabs/MembersTab";
+import { TerritoriesTab } from "@/app/components/clan/tabs/TerritoriesTab";
+import { MissionsTab } from "@/app/components/clan/tabs/MissionsTab";
+import { RecruitTab } from "@/app/components/clan/tabs/RecruitTab";
 
-type DynamicClanMember = {
-  id: string;
-  username: string;
-  avatar_url: string | null;
-  rank: string;
-  rank_jp: string;
-  bio: string | null;
-  loyalty: number;
-  strength: number;
-  intelligence: number;
-};
-
-type TabOption = "members" | "territories" | "missions" | "recruit";
+type ClanTab = "members" | "territories" | "missions" | "recruit";
 
 export default function ClanScreen() {
-  const [selectedTab, setSelectedTab] = useState<TabOption>("members");
-  const { profile, refetch: refetchProfile } = useUserProfile();
-  const [dynamicClanMembers, setDynamicClanMembers] = useState<DynamicClanMember[]>([]);
-  const [recruitableMembers, setRecruitableMembers] = useState<DynamicClanMember[]>([]);
-  const { territories, missions, loading: assetsLoading, createTerritory, createMission, updateTerritory, deleteTerritory, updateMission, deleteMission } = useClanAssets(profile?.clans?.id);
+  const [selectedTab, setSelectedTab] = useState<ClanTab>("members");
+  const { profile } = useUserProfile();
   
+  const isOwner = profile?.id === profile?.clans?.owner_id;
+
+  const { territories, missions, loading: assetsLoading, createTerritory, createMission, updateTerritory, deleteTerritory, updateMission, deleteMission } = useClanAssets(profile?.clans?.id);
+  const { members, recruitableMembers, loading: membersLoading, recruitMember } = useClanMembers(profile?.clans?.id, isOwner, profile?.id);
+
   const addTerritorySheetRef = useRef<any>(null);
   const addMissionSheetRef = useRef<any>(null);
   const editTerritorySheetRef = useRef<any>(null);
@@ -41,86 +33,6 @@ export default function ClanScreen() {
 
   const [selectedTerritory, setSelectedTerritory] = useState<Territory | null>(null);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-
-
-  // Placeholder onDismiss for useClanManagement
-  const onDismiss = useCallback(() => {
-    // In a real scenario, this might navigate back or close a modal
-    console.log("Clan management dismissed.");
-  }, []);
-
-
-  const { view, clans, loading } = useClanManagement(profile, refetchProfile, onDismiss);
-
-  useEffect(() => {
-    const fetchClanMembers = async () => {
-      if (!profile?.clans?.id) {
-        setDynamicClanMembers([]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, rank, rank_jp, bio, loyalty, strength, intelligence') // Select relevant profile fields
-        .eq('clan_id', profile.clans.id);
-
-      if (error) {
-        console.error("Error fetching clan members:", error);
-        setDynamicClanMembers([]);
-      } else {
-        setDynamicClanMembers(data as DynamicClanMember[]);
-      }
-    };
-
-    fetchClanMembers();
-  }, [profile?.clans?.id]);
-
-  useEffect(() => {
-    const fetchRecruitableMembers = async () => {
-      if (!profile?.clans?.id || profile?.id !== profile?.clans?.owner_id) {
-        setRecruitableMembers([]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, rank, rank_jp, bio, loyalty, strength, intelligence')
-        .is('clan_id', null);
-
-      if (error) {
-        console.error("Error fetching recruitable members:", error);
-        setRecruitableMembers([]);
-      } else {
-        setRecruitableMembers(data as DynamicClanMember[]);
-      }
-    };
-
-    fetchRecruitableMembers();
-  }, [profile?.clans?.id, profile?.id, profile?.clans?.owner_id]);
-
-
-  useEffect(() => {
-    const fetchClanMembers = async () => {
-      if (!profile?.clans?.id) {
-        setDynamicClanMembers([]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, rank, rank_jp, bio, loyalty, strength, intelligence') // Select relevant profile fields
-        .eq('clan_id', profile.clans.id);
-
-      if (error) {
-        console.error("Error fetching clan members:", error);
-        setDynamicClanMembers([]);
-      } else {
-        setDynamicClanMembers(data as DynamicClanMember[]);
-      }
-    };
-
-    fetchClanMembers();
-  }, [profile?.clans?.id]);
 
   const handleAddTerritory = async (name: string, description: string) => {
     await createTerritory(name, description);
@@ -156,10 +68,32 @@ export default function ClanScreen() {
     editMissionSheetRef.current?.present();
   };
 
+  const clanTabs: Tab<ClanTab>[] = [
+    { label: 'Membros', value: 'members' },
+    { label: 'Territórios', value: 'territories' },
+    { label: 'Missões', value: 'missions' },
+    ...(isOwner ? [{ label: 'Recrutar', value: 'recruit' as ClanTab }] : []),
+  ];
+
+  const renderContent = () => {
+    switch (selectedTab) {
+      case 'members':
+        return <MembersTab members={members} loading={membersLoading} />;
+      case 'territories':
+        return <TerritoriesTab territories={territories} loading={assetsLoading} isOwner={isOwner} onAdd={() => addTerritorySheetRef.current?.present()} onEdit={openEditTerritorySheet} />;
+      case 'missions':
+        return <MissionsTab missions={missions} loading={assetsLoading} isOwner={isOwner} onAdd={() => addMissionSheetRef.current?.present()} onEdit={openEditMissionSheet} />;
+      case 'recruit':
+        return <RecruitTab recruitableMembers={recruitableMembers} loading={membersLoading} onRecruit={recruitMember} />;
+      default:
+        return null;
+    }
+  };
+
   const clanName = profile?.clans?.name || "Nenhum Clã";
   const clanTag = profile?.clans?.tag || "";
-  const clanEmblem = profile?.clans?.emblem || "組"; // Default emblem
-  const activeMembersCount = dynamicClanMembers.length;
+  const clanEmblem = profile?.clans?.emblem || "組";
+  const activeMembersCount = members.length;
 
   return (
     <>
@@ -189,7 +123,6 @@ export default function ClanScreen() {
 
         {/* CONTEÚDO */}
         <View className="px-6 pt-6">
-
           {/* Status do Clã */}
           <View className="bg-black border border-zinc-900 rounded-lg p-5 mb-6">
             <Text className="text-neutral-500 text-xs uppercase tracking-wider mb-3">
@@ -224,270 +157,13 @@ export default function ClanScreen() {
             </View>
           </View>
 
-          {/* Tabs de Navegação */}
-            <CustomTabs 
-            selectedTab={selectedTab} 
-              setSelectedTab={setSelectedTab}
-              isOwner={profile?.id === profile?.clans?.owner_id}
-            />
+          <GenericTabs
+            tabs={clanTabs}
+            selectedTab={selectedTab}
+            onTabPress={setSelectedTab}
+          />
 
-          {/* MEMBROS TAB */}
-          {selectedTab === "members" && (
-            <View className="mb-8">
-              <View className="flex-row items-center mb-4">
-                <Text className="text-red-500 text-base font-bold">構成員</Text>
-                <View className="flex-1 h-px bg-neutral-800 ml-3" />
-              </View>
-
-              {dynamicClanMembers.map((member) => (
-                <View
-                  key={member.id}
-                  className="bg-black border border-zinc-900 rounded-lg p-4 mb-3"
-                >
-                  <View className="flex-row justify-between items-start mb-3">
-                    <View className="flex-row items-center gap-3 flex-1">
-                      {/* Placeholder for avatar, replace with Image component if avatar_url is available */}
-                      {member.avatar_url ? (
-                        <View className="w-14 h-14 rounded-full overflow-hidden">
-                          <Image source={{ uri: member.avatar_url }} className="w-14 h-14 rounded-full" />
-                        </View>
-                      ) : (
-                        <View className="w-14 h-14 bg-zinc-950 rounded-full flex items-center justify-center">
-                          <Text className="text-zinc-600 text-2xl  font-bold">{member.username.charAt(0).toUpperCase()}</Text>
-                        </View>
-                      )}
-                      <View className="flex-1 ">
-                        <Text className="text-white text-base font-bold mb-1">
-                          {member.username}
-                        </Text>
-                        <View className="flex-row items-center gap-2">
-                          <Text className="text-red-500 text-xs font-semibold">
-                            {member.rank_jp}
-                          </Text>
-                          <Text className="text-neutral-600 text-xs">•</Text>
-                          <Text className="text-neutral-400 text-xs">
-                            {member.rank}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                    <View className={`px-3 py-1 rounded-full bg-green-950/30`}>
-                      <Text className={`text-xs font-semibold text-green-500`}>
-                        ATIVO
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text className="text-neutral-500 text-xs mb-3">
-                    Especialidade: <Text className="text-neutral-400">{member.bio || "N/A"}</Text>
-                  </Text>
-
-                  {/* Static progress bars for now */}
-                  <View className="gap-2">
-                    <View>
-                      <View className="flex-row justify-between mb-1">
-                        <Text className="text-neutral-500 text-xs">Lealdade</Text>
-                        <Text className="text-white text-xs font-semibold">{member.loyalty}%</Text>
-                      </View>
-                      <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden">
-                        <View className="bg-red-600 h-full" style={{ width: `${member.loyalty}%` }} />
-                      </View>
-                    </View>
-
-                    <View className="flex-row gap-2">
-                      <View className="flex-1">
-                        <View className="flex-row justify-between mb-1">
-                          <Text className="text-neutral-500 text-xs">Força</Text>
-                          <Text className="text-white text-xs">{member.strength}</Text>
-                        </View>
-                        <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden">
-                          <View className="bg-orange-600 h-full" style={{ width: `${member.strength}%` }} />
-                        </View>
-                      </View>
-
-                      <View className="flex-1">
-                        <View className="flex-row justify-between mb-1">
-                          <Text className="text-neutral-500 text-xs">Intel.</Text>
-                          <Text className="text-white text-xs">{member.intelligence}</Text>
-                        </View>
-                        <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden">
-                          <View className="bg-blue-600 h-full" style={{ width: `${member.intelligence}%` }} />
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* RECRUIT TAB */}
-          {selectedTab === "recruit" && (
-            <View className="mb-8">
-              <View className="flex-row items-center mb-4">
-                <Text className="text-red-500 text-base font-bold">勧誘</Text>
-                <View className="flex-1 h-px bg-neutral-800 ml-3" />
-              </View>
-
-              {recruitableMembers.map((member) => (
-                <View
-                  key={member.id}
-                  className="bg-black border border-zinc-900 rounded-lg p-4 mb-3"
-                >
-                  <View className="flex-row justify-between items-start mb-3">
-                    <View className="flex-row items-center gap-3 flex-1">
-                      {/* Placeholder for avatar, replace with Image component if avatar_url is available */}
-                      {member.avatar_url ? (
-                        <View className="w-14 h-14 rounded-full overflow-hidden">
-                          <Image source={{ uri: member.avatar_url }} className="w-14 h-14 rounded-full" />
-                        </View>
-                      ) : (
-                        <View className="w-14 h-14 bg-zinc-950 rounded-full flex items-center justify-center">
-                          <Text className="text-zinc-600 text-2xl  font-bold">{member.username.charAt(0).toUpperCase()}</Text>
-                        </View>
-                      )}
-                      <View className="flex-1 ">
-                        <Text className="text-white text-base font-bold mb-1">
-                          {member.username}
-                        </Text>
-                        <View className="flex-row items-center gap-2">
-                          <Text className="text-red-500 text-xs font-semibold">
-                            {member.rank_jp}
-                          </Text>
-                          <Text className="text-neutral-600 text-xs">•</Text>
-                          <Text className="text-neutral-400 text-xs">
-                            {member.rank}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                    <Pressable
-                      onPress={async () => {
-                        if (!profile?.clans?.id) return;
-                        const { error } = await supabase
-                          .from('profiles')
-                          .update({ clan_id: profile.clans.id })
-                          .eq('id', member.id);
-                        if (error) {
-                          console.error("Error recruiting member:", error);
-                        } else {
-                          refetchProfile();
-                        }
-                      }}
-                      className="active:opacity-70"
-                    >
-                      <View className="bg-red-600 px-4 mt-3 py-2 rounded-lg">
-                        <Text className="text-white text-xs font-bold">RECRUTAR</Text>
-                      </View>
-                    </Pressable>
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-
-
-          {/* TERRITÓRIOS TAB */}
-          {selectedTab === "territories" && (
-            <View className="mb-8">
-              <View className="flex-row items-center mb-4">
-                <Text className="text-red-500 text-base font-bold">縄張り</Text>
-                <View className="flex-1 h-px bg-neutral-800 ml-3" />
-              </View>
-
-              {assetsLoading ? <View className="items-center p-8"><KanjiLoader /></View> : territories.map((territory) => (
-                <View
-                  key={territory.id}
-                  className="bg-black border border-zinc-900 rounded-lg p-4 mb-3"
-                >
-                  <View className="flex-row justify-between items-start mb-3">
-                    <View>
-                      <Text className="text-white text-lg font-bold mb-1">
-                        {territory.name}
-                      </Text>
-                      <Text className="text-neutral-400 text-xs">
-                        {territory.description || "Sem descrição."}
-                      </Text>
-                    </View>
-                    {profile?.id === profile?.clans?.owner_id && (
-                      <Pressable className="active:opacity-70" onPress={() => openEditTerritorySheet(territory)}>
-                        <View className="bg-red-600 px-4 py-2 rounded-lg">
-                          <Text className="text-white text-xs font-bold">GERENCIAR</Text>
-                        </View>
-                      </Pressable>
-                    )}
-                  </View>
-                </View>
-              ))}
-
-              {profile?.id === profile?.clans?.owner_id && (
-                <Pressable className="active:opacity-70 mt-2" onPress={() => addTerritorySheetRef.current?.present()}>
-                  <View className="bg-red-950/20 border border-red-900/50 rounded-lg py-3 items-center">
-                    <Text className="text-red-500 font-bold text-sm">+ EXPANDIR PARA NOVO TERRITÓRIO</Text>
-                  </View>
-                </Pressable>
-              )}
-            </View>
-          )}
-
-          {/* MISSÕES TAB */}
-          {selectedTab === "missions" && (
-            <View className="mb-8">
-              <View className="flex-row items-center mb-4">
-                <Text className="text-red-500 text-base font-bold">任務</Text>
-                <View className="flex-1 h-px bg-neutral-800 ml-3" />
-              </View>
-
-              <View className="bg-red-950/20 border-l-4 border-red-600 p-4 rounded-r-lg mb-5">
-                <Text className="text-neutral-400 text-xs leading-5">
-                  Missões fortalecem o controle territorial e geram recursos. Escolha seus
-                  membros sabiamente baseado na dificuldade da operação.
-                </Text>
-              </View>
-
-              {assetsLoading ? <View className="items-center p-8"><KanjiLoader /></View> : missions.map((mission) => {
-                return (
-                  <View
-                    key={mission.id}
-                    className={`mb-4 rounded-lg border p-4 bg-zinc-950 border-neutral-800`}
-                  >
-                    <View className="flex-row justify-between items-start mb-3">
-                      <View className="flex-1">
-                        <Text className="text-white text-base font-bold mb-1">
-                          {mission.name}
-                        </Text>
-                        <Text className="text-neutral-400 text-xs">
-                          {mission.description || "Sem descrição."}
-                        </Text>
-                      </View>
-                      <View className="bg-green-950/30 px-3 py-1 rounded-full">
-                        <Text className="text-green-500 text-xs font-bold">
-                          {JSON.stringify(mission.reward)}
-                        </Text>
-                      </View>
-                    </View>
-
-                    {profile?.id === profile?.clans?.owner_id && (
-                      <Pressable className="active:opacity-70" onPress={() => openEditMissionSheet(mission)}>
-                        <View className="bg-red-600 rounded-lg py-3 items-center">
-                          <Text className="text-white font-bold text-sm">
-                            GERENCIAR MISSÃO
-                          </Text>
-                        </View>
-                      </Pressable>
-                    )}
-                  </View>
-                );
-              })}
-               {profile?.id === profile?.clans?.owner_id && (
-                <Pressable className="active:opacity-70 mt-2" onPress={() => addMissionSheetRef.current?.present()}>
-                  <View className="bg-red-950/20 border border-red-900/50 rounded-lg py-3 items-center">
-                    <Text className="text-red-500 font-bold text-sm">+ CRIAR NOVA MISSÃO</Text>
-                  </View>
-                </Pressable>
-              )}
-            </View>
-          )}
+          {renderContent()}
 
           {/* Footer */}
           <View className="items-center py-8 mb-6">

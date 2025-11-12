@@ -28,7 +28,7 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
-  const [editJapaneseName, setEditJapaneseName] = useState<string[]>([]);
+  const [editJapaneseName, setEditJapaneseName] = useState('');
 
   const japaneseNameSheetRef = useRef<any>(null); // Ref for the new sheet
 
@@ -42,15 +42,15 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
       setEditTwitterUsername(profile.twitter ? profile.twitter.split('/').pop() ?? '' : '');
       setEditAvatarUrl(profile.avatar_url || null);
       setEditBannerUrl(profile.banner_url || null);
-      setEditJapaneseName(profile.username_jp ? profile.username_jp.split('') : []);
+      setEditJapaneseName(profile.username_jp || '');
     }
   }, [profile]);
 
   const handlePresentJapaneseNameModal = useCallback(() => {
-    japaneseNameSheetRef.current?.present();
-  }, []);
+    japaneseNameSheetRef.current?.present(editJapaneseName);
+  }, [editJapaneseName]);
 
-  const handleSaveJapaneseName = (newName: string[]) => {
+  const handleSaveJapaneseName = (newName: string) => {
     setEditJapaneseName(newName);
   };
 
@@ -163,7 +163,7 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
         avatar_url: finalAvatarUrl,
         banner_url: finalBannerUrl,
         updated_at: new Date().toISOString(),
-        username_jp: editJapaneseName.join(''),
+        username_jp: editJapaneseName,
       };
 
       const { error: profileError } = await supabase.from('profiles').upsert(updates, { onConflict: 'id' });
@@ -211,7 +211,7 @@ export const EditProfileSheet = forwardRef<any, EditProfileSheetProps>(({ profil
           setNewEmail={setNewEmail}
           newPassword={newPassword}
           setNewPassword={setNewPassword}
-          japaneseName={editJapaneseName}
+          japaneseName={editJapaneseName.split('')}
           onEditJapaneseName={handlePresentJapaneseNameModal} // Pass the handler
         />
         <CustomButton

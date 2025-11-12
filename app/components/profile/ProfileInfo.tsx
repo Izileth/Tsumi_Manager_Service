@@ -5,13 +5,32 @@ type ProfileInfoProps = {
   profile: Profile;
   onClanPress: () => void;
   onEditJapaneseNamePress: () => void;
-    japaneseName: string;
   onEditClanEmblemPress: () => void;
 };
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+};
+
+const formatJapaneseName = (name: string | string[] | null | undefined): string => {
+  if (Array.isArray(name)) {
+    return name.join('');
+  }
+  if (typeof name === 'string') {
+    if (name.startsWith('[') && name.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(name.replace(/'/g, '"'));
+        if (Array.isArray(parsed)) {
+          return parsed.join('');
+        }
+      } catch (error) {
+        console.error('Error parsing Japanese name:', error);
+      }
+    }
+    return name;
+  }
+  return '...';
 };
 
 export function ProfileInfo({
@@ -76,7 +95,7 @@ export function ProfileInfo({
               <Text className="text-red-500 font-bold text-sm tracking-wider">名前</Text>
             </View>
             <Text className="text-white text-2xl font-bold tracking-wide">
-              {profile.username_jp || '...'}
+              {formatJapaneseName(profile.username_jp)}
             </Text>
           </View>
         </Pressable>

@@ -5,12 +5,12 @@ import KanjiDictionary from '@/components/ui/KanjiDictionary';
 import { CustomButton } from '@/components/ui/custom-button';
 
 type EditJapaneseNameSheetProps = {
+  initialName: string;
   onSave: (name: string) => void;
-  
 };
 
-export const EditJapaneseNameSheet = forwardRef(({ onSave }: EditJapaneseNameSheetProps, ref) => {
-  const [japaneseName, setJapaneseName] = useState('');
+export const EditJapaneseNameSheet = forwardRef(({ initialName, onSave }: EditJapaneseNameSheetProps, ref) => {
+  const [japaneseName, setJapaneseName] = useState(initialName);
   const sheetRef = useRef<any>(null);
 
   useImperativeHandle(ref, () => ({

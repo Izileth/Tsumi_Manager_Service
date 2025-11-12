@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View, Pressable } from 'react-native';
 import type { User } from '@supabase/supabase-js';
 
 type ProfileFormProps = {
@@ -18,8 +18,29 @@ type ProfileFormProps = {
   newEmail: string;
   setNewEmail: (value: string) => void;
   newPassword: string;
-    japaneseName: string;
   setNewPassword: (value: string) => void;
+  japaneseName: string[];
+  onEditJapaneseName: () => void;
+};
+
+const formatJapaneseName = (name: string | string[] | null | undefined): string => {
+  if (Array.isArray(name)) {
+    return name.join('');
+  }
+  if (typeof name === 'string') {
+    if (name.startsWith('[') && name.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(name.replace(/'/g, '"'));
+        if (Array.isArray(parsed)) {
+          return parsed.join('');
+        }
+      } catch (error) {
+        console.error('Error parsing Japanese name:', error);
+      }
+    }
+    return name;
+  }
+  return '';
 };
 
 export function ProfileForm({
@@ -40,6 +61,8 @@ export function ProfileForm({
   setNewEmail,
   newPassword,
   setNewPassword,
+  japaneseName,
+  onEditJapaneseName,
 }: ProfileFormProps) {
   return (
     <>
@@ -134,6 +157,14 @@ export function ProfileForm({
           placeholderTextColor="#666"
           secureTextEntry
         />
+      </View>
+      <View className="mb-6">
+        <Text className="text-neutral-400 mb-2">Nome Japonês</Text>
+        <Pressable onPress={onEditJapaneseName} className="bg-black p-3 rounded-lg border border-zinc-900 flex-row justify-center items-center min-h-[50px]">
+          <Text className="text-white text-2xl tracking-widest">
+            {formatJapaneseName(japaneseName)}
+          </Text>
+        </Pressable>
       </View>
     </>
   );

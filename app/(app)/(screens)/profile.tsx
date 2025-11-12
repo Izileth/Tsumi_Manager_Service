@@ -134,6 +134,7 @@ export default function ProfileScreen() {
       />
       <EditJapaneseNameSheet
         ref={editJapaneseNameSheetRef}
+        initialName={profile?.username_jp || ''}
         onSave={handleSaveJapaneseName}
       />
       <EditClanEmblemSheet

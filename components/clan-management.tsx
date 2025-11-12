@@ -6,7 +6,7 @@ import { useClanManagement, ClanManagementView } from '../app/hooks/use-clan-man
 import { Profile } from '../app/lib/types';
 import { CustomButton } from './ui/custom-button';
 import { KanjiLoader } from './ui/kanji-loader';
-import { ClanEmblemEditor } from '../app/components/clan/ClanEmblemEditor';
+import ClanEmblemEditor from '@/app/components/clan/ClanEmblemEditor';
 
 // Separate FormFields component to prevent re-renders
 type FormFieldsProps = {

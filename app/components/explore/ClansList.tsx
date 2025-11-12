@@ -1,6 +1,5 @@
 import { View, Text, Image } from 'react-native';
 import { Clan } from '@/app/lib/types';
-import { FontAwesome } from '@expo/vector-icons';
 
 type ClansListProps = {
   clans: Clan[];

@@ -120,9 +120,3 @@ export const CustomTabs = ({ selectedTab, setSelectedTab, isOwner }: CustomTabsP
     );
 };
 
-// Exemplo de uso:
-// <CustomTabs
-//   selectedTab={selectedTab}
-//   setSelectedTab={setSelectedTab}
-//   isOwner={profile?.id === profile?.clans?.owner_id}
-// />

@@ -37,8 +37,8 @@ export function TerritoriesTab({ territories, loading, isOwner, onAdd, onEdit }:
               </Text>
             </View>
             {isOwner && (
-              <Pressable className="active:opacity-70" onPress={() => onEdit(territory)}>
-                <View className="bg-red-600 px-4 py-2 rounded-lg">
+              <Pressable className="active:opacity-70 mt-4" onPress={() => onEdit(territory)}>
+                <View className="bg-red-600 px-4 py-3 rounded-lg">
                   <Text className="text-white text-xs font-bold">GERENCIAR</Text>
                 </View>
               </Pressable>

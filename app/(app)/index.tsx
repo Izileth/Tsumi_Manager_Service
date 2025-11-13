@@ -5,12 +5,13 @@ import { useAuth } from "../context/auth-context";
 import { useProfile } from "../context/profile-context";
 import { CustomButton } from "@/components/ui/custom-button";
 import { KanjiLoader } from "@/components/ui/kanji-loader";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeScreen() {
   const { logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
   const { profile, loading, error } = useProfile();
-  
+
   // Animação do símbolo
   const scrollY = useRef(new Animated.Value(0)).current;
   const symbolOpacity = scrollY.interpolate({
@@ -18,7 +19,7 @@ export default function HomeScreen() {
     outputRange: [1, 0.5, 0],
     extrapolate: 'clamp',
   });
-  
+
   const symbolScale = scrollY.interpolate({
     inputRange: [-100, 0],
     outputRange: [1.2, 0.8],
@@ -142,6 +143,7 @@ export default function HomeScreen() {
                 </View>
               </View>
 
+
               {/* Nome e Rank */}
               <View className="flex-1 ml-4 mb-2">
                 <Text className="text-white text-2xl font-bold tracking-tight">
@@ -178,10 +180,7 @@ export default function HomeScreen() {
                   {profile.level || 0}
                 </Text>
                 <View className="h-1 bg-zinc-800 rounded-full mt-2 overflow-hidden">
-                  <View
-                    className="h-full bg-gradient-to-r from-red-600 to-red-500 rounded-full"
-                    style={{ width: `${Math.min((profile.level || 0) / 10, 100)}%` }}
-                  />
+                  <View className="bg-red-600 h-full" style={{ width: `${Math.min(100, profile?.level || 0)}%` }} />
                 </View>
               </View>
 
@@ -202,11 +201,11 @@ export default function HomeScreen() {
               {/* Territórios */}
               <View className="flex-1 bg-black/80 backdrop-blur-sm rounded-xl p-3 border border-zinc-800/50">
                 <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-neutral-400 text-xs">Território</Text>
+                  <Text className="text-neutral-400 text-xs">Insígnia</Text>
                   <Text className="text-red-500 text-xs">地</Text>
                 </View>
                 <Text className="text-white text-lg font-bold">
-                  {profile.level_name_jp || '0'}
+                  {profile.clans?.emblem || '0'}
                 </Text>
                 <Text className="text-neutral-500 text-xs mt-1">
                   Principal
@@ -215,8 +214,13 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <View className="absolute top-0 inset-0 bg-black/20" />
-          <View className="absolute bottom-0 inset-0 bg-black/95" />
+
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)', '#000000']}
+            locations={[0, 0.5, 0.8, 1]}
+            className="absolute bottom-0 inset-0"
+          />
+
           {/* Detalhes vermelhos laterais */}
           <View className="absolute left-0 top-40 w-1 h-32 bg-red-600" />
           <View className="absolute right-0 top-40 w-1 h-32 bg-red-600" />
@@ -245,7 +249,7 @@ export default function HomeScreen() {
             <Text className="text-neutral-300 text-base leading-7 mb-4">
               O submundo segue uma estrutura rígida de respeito e lealdade.
               Seu rank atual é <Text className="text-red-500 font-bold">{profile.rank_jp || '若衆'} ({profile.rank || 'Wakashu'})</Text>,
-              o primeiro passo na jornada. Acumule <Text className="text-white font-semibold">pontos de lealdade</Text> para
+              baseado em sua posição no submundo. Acumule <Text className="text-white font-semibold">pontos de lealdade</Text> para
               subir para Kyodai e eventualmente tornar-se um Oyabun.
             </Text>
           </View>

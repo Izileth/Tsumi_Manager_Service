@@ -1,11 +1,34 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text } from 'react-native';
 import { District } from '@/app/lib/types';
 import { EnrichedTerritory } from '@/app/hooks/useExploreData';
 import { useState } from 'react';
+import MapView, { Marker } from 'expo-maps';
+import { mapStyle } from '@/constants/map-style';
 
 type TerritoryMapProps = {
   districts: District[];
   territories: EnrichedTerritory[];
+};
+
+// Bounding box for Tokyo area
+const TOKYO_REGION = {
+  latitude: 35.6895,
+  longitude: 139.6917,
+  latitudeDelta: 0.4,
+  longitudeDelta: 0.4,
+};
+
+const convertPercentageToCoords = (x: number, y: number) => {
+  const { latitude, longitude, latitudeDelta, longitudeDelta } = TOKYO_REGION;
+  const north = latitude + latitudeDelta / 2;
+  const south = latitude - latitudeDelta / 2;
+  const east = longitude + longitudeDelta / 2;
+  const west = longitude - longitudeDelta / 2;
+
+  const lat = south + (y / 100) * (north - south);
+  const lon = west + (x / 100) * (east - west);
+
+  return { latitude: lat, longitude: lon };
 };
 
 export function TerritoryMap({ districts, territories }: TerritoryMapProps) {
@@ -21,21 +44,32 @@ export function TerritoryMap({ districts, territories }: TerritoryMapProps) {
       </Text>
       
       {/* Map Visualization */}
-      <View className="w-full h-64 bg-black border border-zinc-900 rounded-lg mb-4 relative p-2">
-        <Text className="text-neutral-600 absolute top-2 left-3 text-xs">MAPA DE TOKYO</Text>
-        {districts.map(district => (
-          <Pressable
-            key={district.id}
-            className={`absolute w-8 h-8 rounded-full items-center justify-center border-2 ${selectedDistrict?.id === district.id ? 'border-red-500 bg-red-900/50' : 'border-zinc-700 bg-zinc-900'}`}
-            style={{
-              left: `${district.map_coordinates.x}%`,
-              top: `${district.map_coordinates.y}%`,
-            }}
-            onPress={() => setSelectedDistrict(district)}
-          >
-            <Text className="text-white text-[10px] font-bold">{district.name.substring(0, 2)}</Text>
-          </Pressable>
-        ))}
+      <View className="w-full h-80 bg-black border border-zinc-900 rounded-lg mb-4 overflow-hidden">
+        <MapView
+          style={{ flex: 1 }}
+          initialRegion={TOKYO_REGION}
+          customMapStyle={mapStyle}
+          showsUserLocation={false}
+          showsMyLocationButton={false}
+          scrollEnabled={false}
+          zoomEnabled={false}
+        >
+          {districts.map(district => {
+            const coord = convertPercentageToCoords(district.map_coordinates.x, district.map_coordinates.y);
+            return (
+              <Marker
+                key={district.id}
+                coordinate={coord}
+                onPress={() => setSelectedDistrict(district)}
+                tracksViewChanges={false}
+              >
+                <View className={`w-8 h-8 rounded-full items-center justify-center border-2 ${selectedDistrict?.id === district.id ? 'border-red-500 bg-red-900/50' : 'border-zinc-700 bg-zinc-900'}`}>
+                  <Text className="text-white text-[10px] font-bold">{district.name.substring(0, 2).toUpperCase()}</Text>
+                </View>
+              </Marker>
+            );
+          })}
+        </MapView>
       </View>
 
       {/* Selected District Info */}

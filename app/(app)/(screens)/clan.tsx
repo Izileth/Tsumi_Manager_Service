@@ -143,14 +143,14 @@ export default function ClanScreen() {
               <View className="flex-1">
                 <Text className="text-neutral-500 text-xs mb-1">Poder Total</Text>
                 <View className="bg-neutral-900 h-2 rounded-full overflow-hidden">
-                  <View className="bg-red-600 h-full" style={{ width: `${(profile?.clans?.power || 0) / 100}%` }} />
+                  <View className="bg-red-600 h-full" style={{ width: `${Math.min(100, profile?.clans?.power || 0)}%` }} />
                 </View>
                 <Text className="text-white text-sm font-semibold mt-1">{profile?.clans?.power || 0}</Text>
               </View>
               <View className="flex-1">
                 <Text className="text-neutral-500 text-xs mb-1">Reputação</Text>
                 <View className="bg-neutral-900 h-2 rounded-full overflow-hidden">
-                  <View className="bg-yellow-600 h-full" style={{ width: `${(profile?.clans?.reputation || 0) / 1000}%` }} />
+                  <View className="bg-yellow-600 h-full" style={{ width: `${Math.min(100, (profile?.clans?.reputation || 0) / 10)}%` }} />
                 </View>
                 <Text className="text-white text-sm font-semibold mt-1">{profile?.clans?.reputation || 0}</Text>
               </View>

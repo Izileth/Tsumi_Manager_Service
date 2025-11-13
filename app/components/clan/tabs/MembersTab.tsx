@@ -79,7 +79,7 @@ export function MembersTab({ members, loading }: MembersTabProps) {
                 <Text className="text-white text-xs font-semibold">{member.loyalty}%</Text>
               </View>
               <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden">
-                <View className="bg-red-600 h-full" style={{ width: `${member.loyalty}%` }} />
+                <View className="bg-red-600 h-full" style={{ width: `${Math.min(100, member.loyalty)}%` }} />
               </View>
             </View>
 
@@ -90,7 +90,7 @@ export function MembersTab({ members, loading }: MembersTabProps) {
                   <Text className="text-white text-xs">{member.strength}</Text>
                 </View>
                 <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden">
-                  <View className="bg-orange-600 h-full" style={{ width: `${member.strength}%` }} />
+                  <View className="bg-orange-600 h-full" style={{ width: `${Math.min(100, member.strength)}%` }} />
                 </View>
               </View>
 
@@ -100,7 +100,7 @@ export function MembersTab({ members, loading }: MembersTabProps) {
                   <Text className="text-white text-xs">{member.intelligence}</Text>
                 </View>
                 <View className="bg-neutral-900 h-1.5 rounded-full overflow-hidden">
-                  <View className="bg-blue-600 h-full" style={{ width: `${member.intelligence}%` }} />
+                  <View className="bg-blue-600 h-full" style={{ width: `${Math.min(100, member.intelligence)}%` }} />
                 </View>
               </View>
             </View>

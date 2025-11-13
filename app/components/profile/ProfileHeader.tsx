@@ -1,5 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { Image, Linking, Pressable, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { Profile } from '@/app/lib/types';
 
 type ProfileHeaderProps = {
@@ -51,6 +52,13 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
       ) : (
         <View className="absolute inset-0 bg-gradient-to-b from-red-950 via-red-900 to-black" />
       )}
+
+      {/* Degradê escurecendo a imagem */}
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)', '#000000']}
+        locations={[0, 0.5, 0.8, 1]}
+        className="absolute inset-0"
+      />
 
       <View className="flex-1 justify-center z-10 items-center px-6 pt-16">
         <View className="w-24 h-24 rounded-full items-center justify-center mb-4 border-4 border-red-600">

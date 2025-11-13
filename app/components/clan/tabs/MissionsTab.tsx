@@ -32,7 +32,7 @@ export function MissionsTab({ missions, loading, isOwner, onAdd, onEdit }: Missi
       {missions.map((mission) => (
         <View
           key={mission.id}
-          className={`mb-4 rounded-lg border p-4 bg-zinc-950 border-neutral-800`}
+          className={`mb-4 rounded-lg border p-4 bg-black border-neutral-800`}
         >
           <View className="flex-row justify-between items-start mb-3">
             <View className="flex-1">
@@ -45,7 +45,7 @@ export function MissionsTab({ missions, loading, isOwner, onAdd, onEdit }: Missi
             </View>
             <View className="bg-green-950/30 px-3 py-1 rounded-full">
               <Text className="text-green-500 text-xs font-bold">
-                {JSON.stringify(mission.reward)}
+                (mission.reward)
               </Text>
             </View>
           </View>

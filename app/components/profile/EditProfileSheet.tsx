@@ -196,29 +196,16 @@ export const EditProfileSheet = memo(forwardRef<any, EditProfileSheetProps>((pro
         </View>
 
         <View className="mb-4">
-          <Text className="text-neutral-400 mb-2">Website Sem Protocolo</Text>
-          <TextInput className="bg-black text-white p-3 rounded-lg border-zinc-900" value={editWebsiteWithoutProtocol} onChangeText={setEditWebsiteWithoutProtocol} placeholder="https://seu-site.com" placeholderTextColor="#666" autoCapitalize="none" keyboardType="url" />
-        </View>
-
-        <View className="mb-4">
           <Text className="text-neutral-400 mb-2">GitHub</Text>
           <TextInput className="bg-black text-white p-3 rounded-lg border-zinc-900" value={editGithubUsername} onChangeText={setEditGithubUsername} placeholder="seu-usuario" placeholderTextColor="#666" autoCapitalize="none" />
         </View>
 
-        <View className="mb-4">
-          <Text className="text-neutral-400 mb-2">GitHub Sem Protocolo</Text>
-          <TextInput className="bg-black text-white p-3 rounded-lg border-zinc-900" value={editGithubWithoutProtocol} onChangeText={setEditGithubWithoutProtocol} placeholder="seu-usuario" placeholderTextColor="#666" autoCapitalize="none" />
-        </View>
 
         <View className="mb-6">
           <Text className="text-neutral-400 mb-2">Twitter / X</Text>
           <TextInput className="bg-black text-white p-3 rounded-lg border-zinc-900" value={editTwitterUsername} onChangeText={setEditTwitterUsername} placeholder="seu-usuario" placeholderTextColor="#666" autoCapitalize="none" />
         </View>
-        
-        <View className="mb-6">
-          <Text className="text-neutral-400 mb-2">Twitter Sem Protocolo</Text>
-          <TextInput className="bg-black text-white p-3 rounded-lg border-zinc-900" value={editTwitterWithoutProtocol} onChangeText={setEditTwitterWithoutProtocol} placeholder="seu-usuario" placeholderTextColor="#666" autoCapitalize="none" />
-        </View>
+
 
         <View className="mb-6">
           <Text className="text-neutral-400 mb-2">Nome Japonês</Text>

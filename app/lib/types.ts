@@ -34,16 +34,15 @@ export type Profile = {
   rank_jp?: string;
   rank?: string;
   level?: number;
+  website_url?: string | null;
+  github_handle?: string | null;
+  twitter_handle?: string | null;
+  discord_handle?: string | null;
   experience?: number;
   level_name?: string;
   level_name_jp?: string;
   joined_date?: string;
   username_jp?: string;
-    
-  website_url ?: string | null;
-  github_handle?: string | null;
-  twitter_handle?: string | null;
-  discord_handle?: string | null;
 };
 
 export type Territory = {
@@ -64,12 +63,13 @@ export type Mission = {
   reward: any; // JSONB
   created_at: string;
   updated_at: string;
+  level: string;
 };
 
 export type District = {
   id: string;
   name: string;
-  map_coordinates: { x: number; y: number; };
+  map_coordinates: { x: number; y: number };
   created_at: string;
 };
 
@@ -79,6 +79,15 @@ export type GameEvent = {
   description: string;
   clan_id: string | null;
   territory_id: string | null;
+  metadata: any; // JSONB
+  created_at: string;
+};
+
+export type ClanEvent = {
+  id: number;
+  clan_id: string;
+  event_type: string;
+  description: string;
   metadata: any; // JSONB
   created_at: string;
 };

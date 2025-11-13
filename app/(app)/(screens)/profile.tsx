@@ -93,12 +93,15 @@ export default function ProfileScreen() {
     );
   }
 
+  const isOwner = profile.id === profile.clans?.owner_id;
+
   return (
     <>
       <ScrollView className="flex-1 bg-black">
         <ProfileHeader profile={profile} />
         <ProfileInfo
           profile={profile}
+          isOwner={isOwner}
           onClanPress={handlePresentClanModal}
           onEditJapaneseNamePress={handlePresentJapaneseNameModal}
           onEditClanEmblemPress={handlePresentClanEmblemModal}

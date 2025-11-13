@@ -3,6 +3,7 @@ import type { Profile } from '@/app/lib/types';
 import { formatDate } from '@/app/utils/formatDate';
 type ProfileInfoProps = {
   profile: Profile;
+  isOwner: boolean;
   onClanPress: () => void;
   onEditJapaneseNamePress: () => void;
   onEditClanEmblemPress: () => void;
@@ -31,6 +32,7 @@ const formatJapaneseName = (name: string | string[] | null | undefined): string 
 
 export function ProfileInfo({
   profile,
+  isOwner,
   onClanPress,
   onEditJapaneseNamePress,
   onEditClanEmblemPress,
@@ -98,9 +100,10 @@ export function ProfileInfo({
         {profile.clan_id && (
           <Pressable
             onPress={onEditClanEmblemPress}
+            disabled={!isOwner}
             className="active:opacity-70 flex-1"
             style={{ flexBasis: '40%' }}>
-            <View className="bg-black rounded-xl p-4 mb-4 items-center justify-center">
+            <View className={`bg-black rounded-xl p-4 mb-4 items-center justify-center ${!isOwner && 'opacity-50'}`}>
               <View className="flex-row items-center mb-2">
                 <View className="w-1 h-4 bg-red-600 rounded-full mr-2" />
                 <Text className="text-red-500 font-bold text-sm tracking-wider">紋章</Text>

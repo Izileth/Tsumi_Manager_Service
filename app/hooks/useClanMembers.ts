@@ -4,6 +4,7 @@ import { supabase } from '@/app/lib/supabase';
 type DynamicClanMember = {
   id: string;
   username:string;
+  slug: string;
   avatar_url: string | null;
   rank: string;
   rank_jp: string;
@@ -58,7 +59,7 @@ export function useClanMembers(clanId?: string, isOwner?: boolean, ownerId?: str
     }
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, avatar_url, rank, rank_jp, bio, level, loyalty, strength, intelligence')
+      .select('id, username, slug, avatar_url, rank, rank_jp, bio, level, loyalty, strength, intelligence')
       .eq('clan_id', clanId);
 
     if (error) {
@@ -77,7 +78,7 @@ export function useClanMembers(clanId?: string, isOwner?: boolean, ownerId?: str
     }
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, avatar_url, rank, rank_jp, bio, level, loyalty, strength, intelligence')
+      .select('id, username, slug, avatar_url, rank, rank_jp, bio, level, loyalty, strength, intelligence')
       .is('clan_id', null);
 
     if (error) {
@@ -95,9 +96,28 @@ export function useClanMembers(clanId?: string, isOwner?: boolean, ownerId?: str
       .from('profiles')
       .update({ clan_id: clanId })
       .eq('id', memberId);
+      
     if (error) {
       console.error("Error recruiting member:", error);
     } else {
+      // Fetch the profile of the recruited member to get their username
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', memberId)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching recruited member's profile:", profileError);
+      } else if (profileData) {
+        await supabase.from('clan_events').insert({
+          clan_id: clanId,
+          event_type: 'new_member',
+          description: `${profileData.username} juntou-se ao clã.`,
+          metadata: { member_id: memberId }
+        });
+      }
+
       await Promise.all([fetchMembers(), fetchRecruitableMembers()]);
     }
   };

@@ -11,6 +11,7 @@ type AddMissionSheetProps = {
     description: string;
     territoryId: string;
     reward: { money: number; reputation: number };
+    level: number;
   }) => Promise<void>;
   territories: Territory[];
 };
@@ -20,6 +21,7 @@ export const AddMissionSheet = forwardRef(({ onSubmit, territories }: AddMission
   const [description, setDescription] = useState('');
   const [money, setMoney] = useState('');
   const [reputation, setReputation] = useState('');
+  const [level, setLevel] = useState('1');
   const [selectedTerritory, setSelectedTerritory] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const sheetRef = useRef<any>(null);
@@ -46,12 +48,14 @@ export const AddMissionSheet = forwardRef(({ onSubmit, territories }: AddMission
           money: Number(money) || 0,
           reputation: Number(reputation) || 0,
         },
+        level: Number(level) || 1,
       });
       setIsLoading(false);
       setName('');
       setDescription('');
       setMoney('');
       setReputation('');
+      setLevel('1');
       sheetRef.current?.dismiss();
     }
   };
@@ -61,7 +65,6 @@ export const AddMissionSheet = forwardRef(({ onSubmit, territories }: AddMission
       ref={sheetRef}
       title="Nova Missão"
       titleJP="新しい任務"
-      isLoading={isLoading} // Pass isLoading prop here
     >
       <View className="gap-4 pt-4">
         <View>
@@ -124,6 +127,17 @@ export const AddMissionSheet = forwardRef(({ onSubmit, territories }: AddMission
               className="bg-black border border-zinc-900 rounded-lg px-4 py-3 text-white"
             />
           </View>
+        </View>
+        <View>
+          <Text className="text-neutral-400 text-xs mb-2">NÍVEL DA MISSÃO</Text>
+          <TextInput
+            value={level}
+            onChangeText={setLevel}
+            placeholder="1"
+            placeholderTextColor="#555"
+            keyboardType="numeric"
+            className="bg-black border border-zinc-900 rounded-lg px-4 py-3 text-white"
+          />
         </View>
 
         <CustomButton

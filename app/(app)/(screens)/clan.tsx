@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { useProfile } from "@/app/context/profile-context";
 import { useClanAssets } from "@/app/hooks/useClanAssets";
 import { useClanMembers } from "@/app/hooks/useClanMembers";
-import { Territory, Mission } from "@/app/lib/types";
+import { Territory, Mission, ClanEvent } from "@/app/lib/types";
 
 import { GenericTabs, Tab } from "@/components/ui/GenericTabs";
 import { AddTerritorySheet } from "@/app/components/clan/AddTerritorySheet";
@@ -14,8 +14,9 @@ import { MembersTab } from "@/app/components/clan/tabs/MembersTab";
 import { TerritoriesTab } from "@/app/components/clan/tabs/TerritoriesTab";
 import { MissionsTab } from "@/app/components/clan/tabs/MissionsTab";
 import { RecruitTab } from "@/app/components/clan/tabs/RecruitTab";
+import { EventsTab } from "@/app/components/clan/tabs/EventsTab";
 
-type ClanTab = "members" | "territories" | "missions" | "recruit";
+type ClanTab = "members" | "territories" | "missions" | "events" | "recruit";
 
 export default function ClanScreen() {
   const [selectedTab, setSelectedTab] = useState<ClanTab>("members");
@@ -23,7 +24,7 @@ export default function ClanScreen() {
   
   const isOwner = profile?.id === profile?.clans?.owner_id;
 
-  const { territories, missions, loading: assetsLoading, createTerritory, createMission, updateTerritory, deleteTerritory, updateMission, deleteMission } = useClanAssets(profile?.clans?.id);
+  const { territories, missions, events, loading: assetsLoading, createTerritory, createMission, updateTerritory, deleteTerritory, updateMission, deleteMission } = useClanAssets(profile?.clans?.id);
   const { members, recruitableMembers, loading: membersLoading, recruitMember } = useClanMembers(profile?.clans?.id, isOwner, profile?.id);
 
   const addTerritorySheetRef = useRef<any>(null);
@@ -38,7 +39,7 @@ export default function ClanScreen() {
     await createTerritory(name, description);
   };
 
-  const handleAddMission = async (data: { name: string; description: string; territoryId: string; reward: { money: number; reputation: number; }; }) => {
+  const handleAddMission = async (data: { name: string; description: string; territoryId: string; reward: { money: number; reputation: number; }; level: number; }) => {
     await createMission(data);
   };
 
@@ -50,7 +51,7 @@ export default function ClanScreen() {
     await deleteTerritory(id);
   };
 
-  const handleUpdateMission = async (data: { id: string; name: string; description: string; territoryId: string; reward: { money: number; reputation: number; }; }) => {
+  const handleUpdateMission = async (data: { id: string; name: string; description: string; territoryId: string; reward: { money: number; reputation: number; }; level: number; }) => {
     await updateMission(data);
   };
 
@@ -72,6 +73,7 @@ export default function ClanScreen() {
     { label: 'Membros', value: 'members' },
     { label: 'Territórios', value: 'territories' },
     { label: 'Missões', value: 'missions' },
+    { label: 'Eventos', value: 'events' },
     ...(isOwner ? [{ label: 'Recrutar', value: 'recruit' as ClanTab }] : []),
   ];
 
@@ -83,6 +85,8 @@ export default function ClanScreen() {
         return <TerritoriesTab territories={territories} loading={assetsLoading} isOwner={isOwner} onAdd={() => addTerritorySheetRef.current?.present()} onEdit={openEditTerritorySheet} />;
       case 'missions':
         return <MissionsTab missions={missions} loading={assetsLoading} isOwner={isOwner} onAdd={() => addMissionSheetRef.current?.present()} onEdit={openEditMissionSheet} />;
+      case 'events':
+        return <EventsTab events={events} loading={assetsLoading} />;
       case 'recruit':
         return <RecruitTab recruitableMembers={recruitableMembers} loading={membersLoading} onRecruit={recruitMember} />;
       default:

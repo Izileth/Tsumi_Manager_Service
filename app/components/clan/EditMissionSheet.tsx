@@ -12,6 +12,7 @@ type EditMissionSheetProps = {
     description: string;
     territoryId: string;
     reward: { money: number; reputation: number };
+    level: number;
   }) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   mission: Mission | null;
@@ -23,6 +24,7 @@ export const EditMissionSheet = forwardRef(({ onUpdate, onDelete, mission, terri
   const [description, setDescription] = useState('');
   const [money, setMoney] = useState('');
   const [reputation, setReputation] = useState('');
+  const [level, setLevel] = useState('1');
   const [selectedTerritory, setSelectedTerritory] = useState<string | undefined>();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -35,6 +37,7 @@ export const EditMissionSheet = forwardRef(({ onUpdate, onDelete, mission, terri
       setSelectedTerritory(mission.territory_id);
       setMoney(String(mission.reward?.money || ''));
       setReputation(String(mission.reward?.reputation || ''));
+      setLevel(String(mission.level || '1'));
     }
   }, [mission]);
 
@@ -55,6 +58,7 @@ export const EditMissionSheet = forwardRef(({ onUpdate, onDelete, mission, terri
           money: Number(money) || 0,
           reputation: Number(reputation) || 0,
         },
+        level: Number(level) || 1,
       });
       setIsUpdating(false);
       sheetRef.current?.dismiss();
@@ -137,6 +141,17 @@ export const EditMissionSheet = forwardRef(({ onUpdate, onDelete, mission, terri
               className="bg-black border border-zinc-900 rounded-lg px-4 py-3 text-white"
             />
           </View>
+        </View>
+        <View>
+          <Text className="text-neutral-400 text-xs mb-2">NÍVEL DA MISSÃO</Text>
+          <TextInput
+            value={level}
+            onChangeText={setLevel}
+            placeholder="1"
+            placeholderTextColor="#555"
+            keyboardType="numeric"
+            className="bg-black border border-zinc-900 rounded-lg px-4 py-3 text-white"
+          />
         </View>
         <CustomButton
           title="Salvar Alterações"

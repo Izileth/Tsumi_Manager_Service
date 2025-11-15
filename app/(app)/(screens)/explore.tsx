@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useExploreData } from "@/app/hooks/useExploreData";
 import { KanjiLoader } from "@/components/ui/kanji-loader";
 import { Dashboard } from "@/app/components/explore/Dashboard";
-import { TerritoryMap } from "@/app/components/explore/TerritoryMap";
+import { TerritoryMapList } from "@/app/components/explore/TerritoryMap";
 import { ClansList } from "@/app/components/explore/ClansList";
 import { TerritoriesList } from "@/app/components/explore/TerritoriesList";
 import { GenericTabs, Tab } from "@/components/ui/GenericTabs";
@@ -26,7 +26,7 @@ export default function ExploreScreen() {
       case 'dashboard':
         return <Dashboard events={events} clans={clans} territories={territories} />;
       case 'map':
-        return <TerritoryMap districts={districts} territories={territories} />;
+        return <TerritoryMapList districts={districts} territories={territories} />;
       case 'clans':
         return <ClansList clans={clans} />;
       case 'territories':

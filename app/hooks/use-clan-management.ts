@@ -5,6 +5,7 @@ import { useAuth } from '../context/auth-context';
 import { Clan, Profile } from '../lib/types';
 import * as ImagePicker from 'expo-image-picker';
 import Toast from 'react-native-toast-message';
+import * as Notifications from 'expo-notifications';
 
 export type ClanManagementView = 'main' | 'join' | 'create' | 'manage' | 'edit' | 'edit-emblem';
 
@@ -114,6 +115,13 @@ export const useClanManagement = (profile: Profile | null | undefined, refetchPr
     const { error } = await supabase.from('profiles').update({ clan_id: clanId }).eq('id', user.id);
     if (error) Toast.show({ type: "error", text1: "Erro", text2: "Não foi possível entrar no clã.", position: "top", visibilityTime: 3000 });
     else {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Novo membro no clã!",
+          body: `${profile?.username} se juntou ao seu clã.`,
+        },
+        trigger: null,
+      });
       Toast.show({ type: "success", text1: "Sucesso", text2: "Entrou no clã.", position: "top", visibilityTime: 3000 });
       refetchProfile();
       onDismiss();
@@ -157,6 +165,14 @@ export const useClanManagement = (profile: Profile | null | undefined, refetchPr
 
       const { error: joinError } = await supabase.from('profiles').update({ clan_id: newClan.id }).eq('id', user.id);
       if (joinError) throw joinError;
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Novo membro no clã!",
+          body: `${profile?.username} se juntou ao seu clã.`,
+        },
+        trigger: null,
+      });
 
       Toast.show({ type: "success", text1: "Sucesso", text2: "Clã criado e você entrou nele!", position: "top", visibilityTime: 3000 });
       refetchProfile();

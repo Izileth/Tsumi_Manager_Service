@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const DEFAULT_SNAP_POINT = SCREEN_HEIGHT * 0.85; // 70% of screen height
+const DEFAULT_SNAP_POINT = SCREEN_HEIGHT * 0.95; // 70% of screen height
 
 type AppBottomSheetProps = {
   title?: string;

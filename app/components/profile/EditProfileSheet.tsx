@@ -220,7 +220,7 @@ export const EditProfileSheet = memo(forwardRef<any, EditProfileSheetProps>((pro
           title="Salvar Alterações"
           onPress={handleSave}
           isLoading={saving}
-          className="w-full bg-red-900/20 border py-3 rounded-sm mb-12 border-red-800"
+          className="w-full bg-red-900/20 border py-3 rounded-sm mb-32 border-red-800"
           textClassName="text-sm text-zinc-50 font-bold"
         />
       </AppBottomSheet>

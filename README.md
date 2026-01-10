@@ -1,50 +1,110 @@
-# Welcome to your Expo app 👋
+# Tsumi - aplicativo de clãs
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Tsumi é um aplicativo de gamificação social construído com React Native e Expo, projetado para permitir que os usuários criem e gerenciem clãs, participem de missões e interajam em um mundo virtual. O aplicativo utiliza Supabase para seu backend, fornecendo autenticação, banco de dados em tempo real e armazenamento.
 
-## Get started
+## Visão Geral dos Recursos
 
-1. Install dependencies
+- **Autenticação de Usuário**: Sistema de login e registro seguro.
+- **Perfis de Usuário**: Perfis de usuário personalizáveis com avatares, nomes de usuário e biografias.
+- **Criação e Gerenciamento de Clãs**: Os usuários podem criar, personalizar e gerenciar seus próprios clãs.
+- **Sistema de Missões**: Os clãs podem participar de missões para ganhar recompensas e aumentar sua reputação.
+- **Territórios**: Os clãs podem conquistar e controlar territórios no mapa do jogo.
+- **Interação Social**: Os usuários podem interagir entre si, participar de clãs e competir por poder e influência.
+
+## Tech Stack
+
+- **Frontend**: React Native com Expo
+- **Backend**: Supabase (Autenticação, Banco de Dados, Armazenamento)
+- **Estilo**: Tailwind CSS com NativeWind
+- **Navegação**: Expo Router
+- **Linguagem**: TypeScript
+
+## Estrutura do Projeto
+
+```
+/
+├── app/                  # Código-fonte principal do aplicativo
+│   ├── (app)/            # Layouts e telas principais do aplicativo
+│   ├── components/       # Componentes reutilizáveis
+│   ├── context/          # Provedores de contexto React
+│   ├── hooks/            # Hooks React personalizados
+│   ├── lib/              # Módulos de biblioteca (Supabase, etc.)
+│   └── utils/            # Funções utilitárias
+├── assets/               # Imagens, fontes e outros ativos estáticos
+├── components/           # Componentes de UI reutilizáveis
+├── constants/            # Constantes e dados de configuração
+├── supabase/             # Migrações e configurações do Supabase
+├── package.json          # Dependências e scripts do projeto
+└── tsconfig.json         # Configuração do TypeScript
+```
+
+## Começando
+
+### Pré-requisitos
+
+- Node.js (versão 18 ou superior)
+- Expo CLI
+- Yarn ou npm
+
+### Instalação
+
+1. **Clone o repositório:**
+
+   ```bash
+   git clone https://github.com/seu-usuario/tsumi_app.git
+   cd tsumi_app
+   ```
+
+2. **Instale as dependências:**
 
    ```bash
    npm install
+   # ou
+   yarn install
    ```
 
-2. Start the app
+### Configuração do Backend (Supabase)
+
+1. **Crie um projeto no Supabase**: Vá para [supabase.com](https://supabase.com) e crie um novo projeto.
+
+2. **Configuração do Esquema do Banco de Dados**: Aplique as migrações do banco de dados local para configurar seu esquema do Supabase:
 
    ```bash
-   npx expo start
+   npx supabase login
+   npx supabase link --project-ref SEU_ID_DE_PROJETO
+   npx supabase db push
    ```
 
-In the output, you'll find options to open the app in a
+3. **Configure as Variáveis de Ambiente**: Renomeie `env.example` para `.env` e adicione suas chaves de API do Supabase.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```env
+   SUPABASE_URL=SUA_URL_DO_SUPABASE
+   SUPABASE_ANON_KEY=SUA_CHAVE_ANON_DO_SUPABASE
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Executando o Aplicativo
 
-## Get a fresh project
+Para iniciar o servidor de desenvolvimento, execute um dos seguintes comandos:
 
-When you're ready, run:
+- **Para iniciar em todas as plataformas (iOS, Android, Web):**
 
-```bash
-npm run reset-project
-```
+  ```bash
+  npm start
+  ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- **Para iniciar especificamente para uma plataforma:**
 
-## Learn more
+  ```bash
+  npm run android
+  npm run ios
+  npm run web
+  ```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts Disponíveis
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `npm start`: Inicia o servidor de desenvolvimento do Expo.
+- `npm run android`: Inicia o aplicativo no emulador do Android ou em um dispositivo conectado.
+- `npm run ios`: Inicia o aplicativo no simulador do iOS ou em um dispositivo conectado.
+- `npm run web`: Inicia o aplicativo em um navegador da web.
+- `npm run lint`: Executa o linter para verificar a qualidade do código.
+- `npm run reset-project`: Redefine o cache do projeto.

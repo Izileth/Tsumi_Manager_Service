@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Territory, Mission, ClanEvent } from '../lib/types';
 import { useAuth } from '../context/auth-context';
 import Toast from 'react-native-toast-message';
+import * as Notifications from 'expo-notifications';
 
 export const useClanAssets = (clanId: string | undefined) => {
   const { user } = useAuth();
@@ -86,6 +87,13 @@ export const useClanAssets = (clanId: string | undefined) => {
         description: `Um novo território, ${name}, foi estabelecido.`,
         metadata: { territory_id: data.id }
       });
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Novo território estabelecido!",
+          body: `O território ${name} foi estabelecido.`,
+        },
+        trigger: null,
+      });
       Toast.show({ type: "success", text1: "Sucesso", text2: "Território criado.", position: "top", visibilityTime: 3000 });
       await fetchAssets();
     }
@@ -108,6 +116,13 @@ export const useClanAssets = (clanId: string | undefined) => {
         event_type: 'territory_annexed',
         description: `O território ${annexedTerritory.name} foi anexado.`,
         metadata: { territory_id: annexedTerritory.id }
+      });
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Novo território anexado!",
+          body: `O território ${annexedTerritory.name} foi anexado.`,
+        },
+        trigger: null,
       });
       Toast.show({ type: "success", text1: "Sucesso", text2: "Território anexado.", position: "top", visibilityTime: 3000 });
       await fetchAssets();
@@ -137,6 +152,13 @@ export const useClanAssets = (clanId: string | undefined) => {
         event_type: 'mission_created',
         description: `Nova missão disponível: ${name}.`,
         metadata: { mission_id: newMission.id }
+      });
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Nova missão disponível!",
+          body: `A missão "${name}" está agora disponível.`,
+        },
+        trigger: null,
       });
       Toast.show({ type: "success", text1: "Sucesso", text2: "Missão criada.", position: "top", visibilityTime: 3000 });
       await fetchAssets();

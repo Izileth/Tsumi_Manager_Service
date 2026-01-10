@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useCallback, useContext, Rea
 import { supabase } from '../lib/supabase';
 import { useAuth } from './auth-context';
 import type { Profile } from '../lib/types';
+import * as Notifications from 'expo-notifications';
 
 type ProfileContextType = {
   profile: Profile | null;
@@ -59,6 +60,8 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) throw new Error('User not authenticated');
     
+    const oldLevel = profile?.level;
+
     const { data, error: updateError } = await supabase
       .from('profiles')
       .update(updates)
@@ -73,6 +76,18 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
 
     if (updateError) throw updateError;
     
+    const newLevel = data?.level;
+
+    if (oldLevel && newLevel && newLevel > oldLevel) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Você subiu de nível!",
+          body: `Parabéns, você alcançou o nível ${newLevel}!`,
+        },
+        trigger: null,
+      });
+    }
+
     setProfile(data as Profile); // Update global state immediately
     return data;
   };

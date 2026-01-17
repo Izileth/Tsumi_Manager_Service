@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput, Pressable, Image } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { User, Lock, Eye, EyeOff, Mail } from "lucide-react-native";
@@ -103,7 +103,11 @@ export default function RegisterScreen() {
         {/* Logo */}
         <View className="items-center mb-12">
           <View className="w-20 h-20 rounded-full bg-transparent border-2 border-red-600 justify-center items-center mb-4 shadow-lg shadow-red-600/50">
-            <Text className="text-4xl text-red-600 font-bold">罪</Text>
+            <Image
+              source={require("../../../assets/images/notification_icon.png")}
+              className="w-16 h-16"
+              resizeMode="contain"
+            />
           </View>
           <Text className="text-5xl font-bold text-white tracking-widest mb-1">TSUMI</Text>
           <Text className="text-sm text-neutral-400 tracking-widest mb-4">Yakuza Brotherhood</Text>

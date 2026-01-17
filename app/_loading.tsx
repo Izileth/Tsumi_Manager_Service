@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions } from "react-native";
+import { View, Text, useWindowDimensions, Image } from "react-native";
 import { useEffect, useCallback } from "react";
 import Animated, {
   useSharedValue,
@@ -115,7 +115,11 @@ export default function LoadingScreen({ onAnimationEnd }: LoadingScreenProps) {
       {/* Logo Central Animado */}
       <Animated.View style={[logoAnimatedStyles]}>
         <View className="w-24 h-24 rounded-full bg-transparent border-4 border-red-600 justify-center items-center shadow-lg shadow-red-600/60">
-          <Text className="text-4xl text-red-600 font-bold">罪</Text>
+          <Image
+            source={require("../assets/images/notification_icon.png")}
+            className="w-20 h-20"
+            resizeMode="contain"
+          />
         </View>
       </Animated.View>
 

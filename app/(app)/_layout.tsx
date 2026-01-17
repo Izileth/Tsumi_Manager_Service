@@ -33,11 +33,12 @@ export default function AppLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false, gestureEnabled: true }} />
+      <Stack.Screen name="index" options={{  headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/explore" options={{ presentation: 'modal', title: 'Explorar', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/clan" options={{ title: 'Clã', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(public)/[slug]" options={{ title: 'Usuario', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/profile" options={{ title: 'Perfil', headerShown: false, gestureEnabled: true }} />
+      <Stack.Screen name="(screens)/feed" options={{ title: 'Feed', headerShown: false, gestureEnabled: true }} />
     </Stack>
   );
 }

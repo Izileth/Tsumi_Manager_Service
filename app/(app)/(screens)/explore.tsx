@@ -46,6 +46,7 @@ export default function ExploreScreen() {
           </Text>
         </View>
 
+  
         <View className="flex-1 justify-end px-6 pb-8">
           <Text className="text-red-500 text-sm font-bold tracking-[0.2em] uppercase mb-2">
             Territórios e Poder

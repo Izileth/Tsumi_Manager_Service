@@ -23,6 +23,7 @@ export type Profile = {
   avatar_url: string | null;
   website: string | null;
   clan_id?: string | null;
+  posts?: Post[]; // User's posts
   // from joins
   clans: Clan | null;
   // other fields from profile screen
@@ -43,6 +44,44 @@ export type Profile = {
   level_name_jp?: string;
   joined_date?: string;
   username_jp?: string;
+};
+
+export type PostReaction = {
+  id: number;
+  post_id: string;
+  user_id: string;
+  reaction_type: string;
+  created_at: string;
+  profiles: Pick<Profile, 'username' | 'avatar_url' | 'slug'>;
+};
+
+export type Hashtag = {
+  id: number;
+  tag: string;
+};
+
+export type PostComment = {
+  id: number;
+  content: string;
+  post_id: string;
+  user_id: string;
+  parent_comment_id: number | null;
+  created_at: string;
+  profiles: Pick<Profile, 'id' | 'username' | 'avatar_url' | 'slug'>;
+};
+
+export type Post = {
+  id: string;
+  user_id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  content: any; // JSONB
+  created_at: string;
+  profiles: Pick<Profile, 'id' | 'username' | 'avatar_url' | 'slug'>;
+  post_reactions: PostReaction[];
+  post_comments: PostComment[];
+  hashtags: { tag: string }[];
 };
 
 export type Territory = {

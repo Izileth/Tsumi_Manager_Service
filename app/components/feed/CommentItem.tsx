@@ -25,7 +25,7 @@ export function CommentItem({ comment }: CommentItemProps) {
           className="w-8 h-8 rounded-full"
         />
       </Pressable>
-      <View className="flex-1 bg-neutral-900 rounded-lg p-3">
+      <View className="flex-1 border-l border-zinc-700 rounded-lg p-3">
         <View className="flex-row justify-between items-center mb-1">
           <Pressable onPress={navigateToProfile}>
             <Text className="text-white font-bold text-sm">{comment.profiles.username}</Text>

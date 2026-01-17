@@ -9,13 +9,12 @@ type PostItemProps = {
   post: Post;
   onReact: (postId: string, reactionType: string) => void;
   onDeleteReaction: (postId: string) => void;
-  onCommentPress: () => void;
   onDelete: (postId: string) => void;
   onEdit: (post: Post) => void;
   currentUserId?: string;
 };
 
-export function PostItem({ post, onReact, onDeleteReaction, onCommentPress, onDelete, onEdit, currentUserId }: PostItemProps) {
+export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, currentUserId }: PostItemProps) {
   const router = useRouter();
   const [isMenuVisible, setMenuVisible] = useState(false);
 
@@ -34,6 +33,10 @@ export function PostItem({ post, onReact, onDeleteReaction, onCommentPress, onDe
     if (post.profiles.slug) {
       router.push(`/(app)/(public)/${post.profiles.slug}`);
     }
+  };
+
+  const handleCommentPress = () => {
+    router.push(`/(app)/(screens)/comments/${post.id}`);
   };
 
   const handleDelete = () => {
@@ -163,7 +166,7 @@ export function PostItem({ post, onReact, onDeleteReaction, onCommentPress, onDe
 
           {/* Botão de Comentários */}
           <Pressable 
-            onPress={onCommentPress} 
+            onPress={handleCommentPress} 
             className="flex-row items-center gap-2"
           >
             <View className="w-9 h-9 bg-black rounded-lg items-center justify-center">

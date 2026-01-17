@@ -39,6 +39,7 @@ export default function AppLayout() {
       <Stack.Screen name="(public)/[slug]" options={{ title: 'Usuario', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/profile" options={{ title: 'Perfil', headerShown: false, gestureEnabled: true }} />
       <Stack.Screen name="(screens)/feed" options={{ title: 'Feed', headerShown: false, gestureEnabled: true }} />
+      <Stack.Screen name="(screens)/comments/[postId]" options={{ title: 'Comentários', headerShown: false, gestureEnabled: true }} />
     </Stack>
   );
 }

@@ -1,21 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
 import { usePosts } from '../../hooks/use-posts';
 import { PostItem } from '../../components/feed/PostItem';
 import { useAuth } from '../../context/auth-context';
 import { PlusCircle, FileText, RefreshCw } from 'lucide-react-native';
 import { CreatePostSheet } from '../../components/feed/CreatePostSheet';
-import { CommentsSheet } from '../../components/feed/CommentsSheet';
 import { Post } from '@/app/lib/types';
+import Toast from 'react-native-toast-message';
 
 export default function FeedScreen() {
   const { user } = useAuth();
-  const { posts, loading, error, fetchPosts, addReaction, deleteReaction, createPost, addComment, deletePost, updatePost } = usePosts();
+  const { posts, loading, error, fetchPosts, addReaction, deleteReaction, createPost, deletePost, updatePost } = usePosts();
   
   const createPostSheetRef = useRef<any>(null);
-  const commentsSheetRef = useRef<any>(null);
-
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -26,14 +23,12 @@ export default function FeedScreen() {
     createPostSheetRef.current?.dismiss();
   };
 
-  const handleCommentPress = (post: Post) => {
-    setSelectedPost(post);
-    commentsSheetRef.current?.present();
-  };
-
   const handleEditPost = (post: Post) => {
-    // TODO: Implement the Edit Post UI (e.g., open a sheet similar to CreatePostSheet)
-    Alert.alert("Editar Postagem", `Funcionalidade de edição para a postagem "${post.title}" a ser implementada.`);
+    Toast.show({
+      type: 'info',
+      text1: 'Em Desenvolvimento',
+      text2: `A edição para "${post.title}" será implementada.`,
+    });
   };
 
   if (loading && posts.length === 0) {
@@ -83,7 +78,6 @@ export default function FeedScreen() {
             onReact={addReaction}
             onDeleteReaction={deleteReaction}
             currentUserId={user?.id}
-            onCommentPress={() => handleCommentPress(item)}
             onDelete={deletePost}
             onEdit={handleEditPost}
           />
@@ -150,7 +144,6 @@ export default function FeedScreen() {
       </Pressable>
 
       <CreatePostSheet ref={createPostSheetRef} onSubmit={handleCreatePost} />
-      <CommentsSheet ref={commentsSheetRef} post={selectedPost} onAddComment={addComment} />
     </View>
   );
 }

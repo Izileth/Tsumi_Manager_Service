@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, Text, Animated, Pressable } from 'react-native';
+import { View, Text, Animated } from 'react-native';
 import { useAuth } from '../context/auth-context';
 import { useProfile } from '../context/profile-context';
 import { KanjiLoader } from '@/components/ui/kanji-loader';
@@ -7,6 +7,7 @@ import { CreateProfilePrompt } from '@/app/components/home/CreateProfilePrompt';
 import { PullToRevealSymbol } from '@/app/components/home/PullToRevealSymbol';
 import { HomeHeader } from '@/app/components/home/HomeHeader';
 import { HomeContent } from '@/app/components/home/HomeContent';
+import { ActivateFeedButton } from '@/app/components/home/ActivateFeedButton';
 import { useRouter } from 'expo-router';
 export default function HomeScreen() {
   const { logout } = useAuth();
@@ -57,9 +58,8 @@ export default function HomeScreen() {
       >
         <HomeHeader profile={profile} />
         <HomeContent profile={profile} handleLogout={handleLogout} loggingOut={loggingOut} />
-        <Pressable onPress={() => router.push('/(app)/(screens)/feed')} className="mt-8 mb-16 mx-auto px-6 py-3 bg-red-600 rounded-full shadow-lg shadow-red-600/50">
-          <Text className="text-white text-lg font-semibold">Ver Feed</Text>
-        </Pressable>
+        <ActivateFeedButton onPress={() => router.push('/(app)/(screens)/feed')} />
+
       </Animated.ScrollView>
     </View>
   );

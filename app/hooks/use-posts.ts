@@ -3,6 +3,9 @@ import { supabase } from '../lib/supabase';
 import { Post } from '../lib/types';
 import { useAuth } from '../context/auth-context';
 import Toast from 'react-native-toast-message';
+import * as FileSystem from 'expo-file-system/legacy';
+import { decode } from 'base64-arraybuffer';
+
 export const usePosts = () => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -26,7 +29,6 @@ export const usePosts = () => {
 
       if (error) throw error;
       
-      // Manual mapping to fit the 'hashtags: { tag: string }[]' type
       const mappedData = data.map(post => ({
         ...post,
         hashtags: post.post_hashtags.map((ph: any) => ph.hashtags),
@@ -44,23 +46,24 @@ export const usePosts = () => {
 
   const uploadPostImage = async (imageUri: string): Promise<string | null> => {
     try {
+      const base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: 'base64' });
       const fileExt = imageUri.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `posts/${user!.id}/${fileName}`;
+      const filePath = `posts/${user!.id}/${Date.now()}.${fileExt}`;
+      const contentType = `image/${fileExt}`;
 
-      const formData = new FormData();
-      formData.append('file', {
-        uri: imageUri,
-        name: fileName,
-        type: `image/${fileExt}`,
-      } as any);
+      const { data, error } = await supabase.storage
+        .from('assets')
+        .upload(filePath, decode(base64), { contentType });
 
-      const { error: uploadError } = await supabase.storage.from('assets').upload(filePath, formData);
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(filePath);
+      if (error) {
+        throw error;
+      }
+      
+      const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(data.path);
       return publicUrl;
-    } catch (e) {
+
+    } catch (e: any) {
+      console.error("Error uploading image:", e);
       Toast.show({ type: "error", text1: "Erro no Upload", text2: "Não foi possível enviar a imagem." });
       return null;
     }

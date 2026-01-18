@@ -10,6 +10,8 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/components/ui/toast-config';
 import '@/global.css';
 
+import GlobalHeader from "./components/ui/GlobalHeader";
+
 const RootLayoutNav = () => {
   const { user, loading } = useAuth();
   const segments = useSegments();
@@ -61,6 +63,7 @@ const RootLayoutNav = () => {
   return (
     <View style={{ flex: 1 }}>
       {/* Slot is now always rendered, allowing navigation to work correctly */}
+      <GlobalHeader />
       <Slot />
       <StatusBar style="light" backgroundColor="#000000" translucent />
 

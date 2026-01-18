@@ -83,7 +83,7 @@ export default function FeedScreen() {
           />
         )}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingTop: 70 , flexGrow: 1, paddingBottom: 90 }}
+        contentContainerStyle={{ paddingTop: 20 , flexGrow: 1, paddingBottom: 90 }}
         ListHeaderComponent={
           <View className="mb-6 mx-2">
             <View className="flex-row items-center mb-2">

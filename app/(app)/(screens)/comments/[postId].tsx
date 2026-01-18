@@ -70,7 +70,7 @@ export default function CommentsScreen() {
     >
       <View className="flex-1 bg-black">
         {/* Header */}
-        <View className="mt-12 border-b-2 border-red-900/20 bg-black">
+        <View className=" border-b-2 border-red-900/20 bg-black">
           <View className="flex-row items-center px-4 py-4">
             <Pressable 
               onPress={() => router.back()} 

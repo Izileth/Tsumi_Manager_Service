@@ -7,13 +7,12 @@ import { CreateProfilePrompt } from '@/app/components/home/CreateProfilePrompt';
 import { PullToRevealSymbol } from '@/app/components/home/PullToRevealSymbol';
 import { HomeHeader } from '@/app/components/home/HomeHeader';
 import { HomeContent } from '@/app/components/home/HomeContent';
-import { ActivateFeedButton } from '@/app/components/home/ActivateFeedButton';
-import { useRouter } from 'expo-router';
+
 export default function HomeScreen() {
   const { logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
   const { profile, loading, error } = useProfile();
-  const router = useRouter();
+
 
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -58,8 +57,6 @@ export default function HomeScreen() {
       >
         <HomeHeader profile={profile} />
         <HomeContent profile={profile} handleLogout={handleLogout} loggingOut={loggingOut} />
-        <ActivateFeedButton onPress={() => router.push('/(app)/(screens)/feed')} />
-
       </Animated.ScrollView>
     </View>
   );

@@ -4,6 +4,7 @@ import { Post } from '../../lib/types';
 import { useRouter } from 'expo-router';
 import { Heart, MessageCircle, MoreHorizontal, Trash2, Edit } from 'lucide-react-native';
 import { formatDate } from '../../utils/formatDate';
+import { PostImageCarousel } from './PostImageCarousel';
 
 type PostItemProps = {
   post: Post;
@@ -57,16 +58,16 @@ export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, cu
   };
 
   return (
-    <View className="bg-black border-l-2 border-red-900/30 rounded-lg mb-4 overflow-hidden">
+    <View className="bg-black border-none rounded-lg mb-4 overflow-hidden">
       {/* Post Header */}
-      <View className="flex-row items-center p-4 border-b border-zinc-900/50">
+      <View className="flex-row items-center p-4 border-b border-zinc-950">
         <Pressable onPress={navigateToProfile}>
           <View className="relative">
             <Image
               source={{ uri: post.profiles.avatar_url || 'https://via.placeholder.com/150' }}
               className="w-11 h-11 rounded-full"
             />
-            <View className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-red-600 rounded-full border-2 border-zinc-950" />
+            <View className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-white rounded-full border-2 border-black" />
           </View>
         </Pressable>
         
@@ -74,26 +75,26 @@ export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, cu
           <Pressable onPress={navigateToProfile}>
             <Text className="text-white font-bold text-base">{post.profiles.username}</Text>
           </Pressable>
-          <Text className="text-neutral-500 text-xs mt-0.5">{formatDate(post.created_at)}</Text>
+          <Text className="text-zinc-500 text-xs mt-0.5">{formatDate(post.created_at)}</Text>
         </View>
 
         {isAuthor && (
           <View>
             <Pressable 
               onPress={() => setMenuVisible(!isMenuVisible)} 
-              className="w-8 h-8 items-center justify-center bg-zinc-900 rounded-lg relative"
+              className="w-8 h-8 items-center justify-center bg-black rounded-lg relative"
             >
-              <MoreHorizontal size={18} color="#666" />
+              <MoreHorizontal size={18} color="#a1a1aa" />
             </Pressable>
             {isMenuVisible && (
-              <View className="absolute top-10 right-0 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-10 w-32">
+              <View className="absolute top-10 right-0 bg-black border border-zinc-800 rounded-lg shadow-lg z-10 w-32">
                 <Pressable onPress={handleEdit} className="flex-row items-center gap-2 p-3">
-                  <Edit size={16} color="#ccc" />
+                  <Edit size={16} color="#fff" />
                   <Text className="text-white">Editar</Text>
                 </Pressable>
                 <Pressable onPress={handleDelete} className="flex-row items-center gap-2 p-3 border-t border-zinc-800">
-                  <Trash2 size={16} color="#ef4444" />
-                  <Text className="text-red-500">Excluir</Text>
+                  <Trash2 size={16} color="#a1a1aa" />
+                  <Text className="text-zinc-400">Excluir</Text>
                 </Pressable>
               </View>
             )}
@@ -105,34 +106,26 @@ export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, cu
       <View className="px-4 py-4">
         {/* Título com barra decorativa */}
         <View className="flex-row mb-3">
-          <View className="w-1 bg-red-600 rounded-full mr-2" />
+          <View className="w-1 bg-white rounded-full mr-2" />
           <Text className="flex-1 text-xl font-bold text-white leading-tight">{post.title}</Text>
         </View>
 
         {post.description && (
-          <Text className="text-neutral-300 text-base leading-relaxed mb-3">
+          <Text className="text-zinc-300 text-base leading-relaxed mb-3">
             {post.description}
           </Text>
         )}
         
-        {post.content?.images && post.content.images[0] && (
-          <View className="relative my-3 rounded-lg overflow-hidden">
-            <Image
-              source={{ uri: post.content.images[0] }}
-              className="w-full h-64 rounded-lg"
-              resizeMode="cover"
-            />
-            {/* Overlay gradiente sutil */}
-            <View className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          </View>
+        {post.images && post.images.length > 0 && (
+          <PostImageCarousel images={post.images} />
         )}
 
         {post.hashtags && post.hashtags.length > 0 && (
           <View className="flex-row flex-wrap gap-2 mt-2">
             {post.hashtags.map((ht, index) => (
               ht.tag && (
-                <View key={index} className="bg-red-950/20 border border-red-900/30 rounded-md px-2.5 py-1">
-                  <Text className="text-red-500 text-xs font-bold">#{ht.tag}</Text>
+                <View key={index} className="bg-zinc-900 border border-zinc-800 rounded-md px-2.5 py-1">
+                  <Text className="text-white text-xs font-bold">#{ht.tag}</Text>
                 </View>
               )
             ))}
@@ -141,7 +134,7 @@ export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, cu
       </View>
 
       {/* Post Actions */}
-      <View className="flex-row items-center justify-between px-4 py-3 border-t-2 border-red-900/20 bg-black/30">
+      <View className="flex-row items-center justify-between px-4 py-3 border-none border-zinc-800">
         <View className="flex-row items-center gap-6">
           {/* Botão de Like */}
           <Pressable 
@@ -149,16 +142,16 @@ export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, cu
             className="flex-row items-center gap-2"
           >
             <View className={`w-9 h-9 rounded-lg items-center justify-center ${
-              userReaction ? 'bg-red-600/20' : 'bg-black'
+              userReaction ? 'bg-white' : 'bg-black'
             }`}>
               <Heart 
                 size={18} 
-                color={userReaction ? '#ef4444' : '#666'} 
-                fill={userReaction ? '#ef4444' : 'transparent'} 
+                color={userReaction ? '#000' : '#a1a1aa'} 
+                fill={userReaction ? '#000' : 'transparent'} 
               />
             </View>
             <Text className={`font-bold ${
-              userReaction ? 'text-red-500' : 'text-neutral-500'
+              userReaction ? 'text-white' : 'text-zinc-500'
             }`}>
               {post.post_reactions.length}
             </Text>
@@ -170,20 +163,14 @@ export function PostItem({ post, onReact, onDeleteReaction, onDelete, onEdit, cu
             className="flex-row items-center gap-2"
           >
             <View className="w-9 h-9 bg-black rounded-lg items-center justify-center">
-              <MessageCircle size={18} color="#666" />
+              <MessageCircle size={18} color="#a1a1aa" />
             </View>
-            <Text className="text-neutral-500 font-bold">
+            <Text className="text-zinc-500 font-bold">
               {post.post_comments?.length || 0}
             </Text>
           </Pressable>
         </View>
-
-        {/* Indicador visual adicional */}
-        <View className="flex-row items-center gap-1">
-          <View className="w-1 h-1 bg-red-600 rounded-full" />
-          <View className="w-1 h-1 bg-red-700 rounded-full" />
-          <View className="w-1 h-1 bg-red-800 rounded-full" />
-        </View>
+      
       </View>
     </View>
   );

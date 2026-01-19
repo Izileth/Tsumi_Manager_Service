@@ -81,18 +81,15 @@ export const usePosts = () => {
         imageUrl = await uploadPostImage(postData.imageUri);
       }
 
-      const finalContent = {
-        ...postData.content,
-        images: imageUrl ? [imageUrl] : [],
-      };
-
       const { data: newPost, error } = await supabase
         .from('posts')
-        .insert({ 
+        .insert({
           title: postData.title,
           description: postData.description,
-          content: finalContent,
-          user_id: user.id 
+          content: postData.content,
+          images: imageUrl ? [imageUrl] : [],
+          videos: [],
+          user_id: user.id,
         })
         .select()
         .single();

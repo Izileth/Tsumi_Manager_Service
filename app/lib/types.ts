@@ -81,6 +81,7 @@ export type Post = {
   profiles: Pick<Profile, 'id' | 'username' | 'avatar_url' | 'slug'>;
   post_reactions: PostReaction[];
   post_comments: PostComment[];
+  images?: string[]; // Array of image URLs
   hashtags: { tag: string }[];
 };
 

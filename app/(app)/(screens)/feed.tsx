@@ -18,17 +18,16 @@ export default function FeedScreen() {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handleCreatePost = async (data: { title: string; description: string; content: any; imageUri?: string; tags?: string[] }) => {
+  const handleCreatePost = async (data: { title: string; description:string; content: any; imageUri?: string; tags?: string[] }) => {
     await createPost(data);
-    createPostSheetRef.current?.dismiss();
+  };
+
+  const handleUpdatePost = async (postId: string, data: Partial<Post>) => {
+    await updatePost(postId, data);
   };
 
   const handleEditPost = (post: Post) => {
-    Toast.show({
-      type: 'info',
-      text1: 'Em Desenvolvimento',
-      text2: `A edição para "${post.title}" será implementada.`,
-    });
+    createPostSheetRef.current?.present(post);
   };
 
   if (loading && posts.length === 0) {
@@ -69,10 +68,11 @@ export default function FeedScreen() {
   }
 
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1  bg-black">
       <FlatList
         data={posts}
         renderItem={({ item }) => (
+        <View className='px-1'>
           <PostItem
             post={item}
             onReact={addReaction}
@@ -81,6 +81,7 @@ export default function FeedScreen() {
             onDelete={deletePost}
             onEdit={handleEditPost}
           />
+        </View>
         )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingTop: 20 , flexGrow: 1, paddingBottom: 90 }}
@@ -143,7 +144,11 @@ export default function FeedScreen() {
         <PlusCircle size={32} color="#ffffff" strokeWidth={2.5} />
       </Pressable>
 
-      <CreatePostSheet ref={createPostSheetRef} onSubmit={handleCreatePost} />
+      <CreatePostSheet 
+        ref={createPostSheetRef} 
+        onSubmit={handleCreatePost}
+        onUpdate={handleUpdatePost}
+      />
     </View>
   );
 }

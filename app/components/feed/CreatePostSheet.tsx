@@ -1,16 +1,18 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, Image } from 'react-native';
 import { AppBottomSheet } from '@/components/ui/bottom-sheet';
 import { CustomButton } from '@/components/ui/custom-button';
 import * as ImagePicker from 'expo-image-picker';
 import Toast from 'react-native-toast-message';
 import { Image as ImageIcon, X } from 'lucide-react-native';
-
+import { Post } from '@/app/lib/types';
 type CreatePostSheetProps = {
   onSubmit: (data: { title: string; description: string; content: any; imageUri?: string; tags?: string[] }) => Promise<void>;
+  onUpdate: (postId: string, data: Partial<Post>) => Promise<void>;
 };
 
-export const CreatePostSheet = forwardRef(({ onSubmit }: CreatePostSheetProps, ref) => {
+export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostSheetProps, ref) => {
+  const [postToEdit, setPostToEdit] = useState<Post | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
@@ -18,8 +20,32 @@ export const CreatePostSheet = forwardRef(({ onSubmit }: CreatePostSheetProps, r
   const [isLoading, setIsLoading] = useState(false);
   const sheetRef = useRef<any>(null);
 
+  const isEditMode = postToEdit !== null;
+
+  useEffect(() => {
+    if (postToEdit) {
+      setTitle(postToEdit.title);
+      setDescription(postToEdit.description || '');
+      setTags(postToEdit.hashtags?.map(h => h.tag).join(', ') || '');
+      setImageUri(postToEdit.images?.[0]);
+    } else {
+      // Reset fields when closing edit mode
+      setTitle('');
+      setDescription('');
+      setTags('');
+      setImageUri(undefined);
+    }
+  }, [postToEdit]);
+
   useImperativeHandle(ref, () => ({
-    present: () => sheetRef.current?.present(),
+    present: (post?: Post) => {
+      if (post) {
+        setPostToEdit(post);
+      } else {
+        setPostToEdit(null);
+      }
+      sheetRef.current?.present();
+    },
     dismiss: () => sheetRef.current?.dismiss(),
   }));
 
@@ -41,31 +67,49 @@ export const CreatePostSheet = forwardRef(({ onSubmit }: CreatePostSheetProps, r
     }
   };
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
-    const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-    
-    await onSubmit({
-      title,
-      description,
-      content: { text: description },
-      imageUri,
-      tags: tagArray,
-    });
-    
+  const cleanup = () => {
     setIsLoading(false);
     setTitle('');
     setDescription('');
     setTags('');
     setImageUri(undefined);
+    setPostToEdit(null);
     sheetRef.current?.dismiss();
+  };
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+    if (isEditMode) {
+      // Update logic
+      await onUpdate(postToEdit.id, {
+        title,
+        description,
+        content: { text: description },
+        // Handling image updates would be more complex, e.g., only upload if changed.
+        // For now, we pass the existing or new URI.
+      });
+    } else {
+      // Create logic
+      await onSubmit({
+        title,
+        description,
+        content: { text: description },
+        imageUri,
+        tags: tagArray,
+      });
+    }
+    
+    cleanup();
   };
 
   return (
     <AppBottomSheet
       ref={sheetRef}
-      title="Nova Postagem"
-      titleJP="新しい投稿"
+      title={isEditMode ? "Editar Postagem" : "Nova Postagem"}
+      titleJP={isEditMode ? "投稿を編集" : "新しい投稿"}
+      onClose={() => setPostToEdit(null)} // Reset state on close
     >
       <View className="gap-5 pt-4">
         {/* Título */}
@@ -121,6 +165,7 @@ export const CreatePostSheet = forwardRef(({ onSubmit }: CreatePostSheetProps, r
               placeholder="ex: #tóquio, #submundo"
               placeholderTextColor="#444"
               className="px-4 py-3.5 text-white"
+              editable={!isEditMode} // Disabling tag editing for simplicity
             />
           </View>
         </View>
@@ -165,7 +210,7 @@ export const CreatePostSheet = forwardRef(({ onSubmit }: CreatePostSheetProps, r
         </View>
 
         <CustomButton
-          title="PUBLICAR"
+          title={isEditMode ? "ATUALIZAR" : "PUBLICAR"}
           onPress={handleSubmit}
           isLoading={isLoading}
           className="w-full bg-gradient-to-r from-red-600 to-red-700 border border-red-800 py-3.5"

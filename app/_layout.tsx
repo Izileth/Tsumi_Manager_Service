@@ -62,7 +62,8 @@ const RootLayoutNav = () => {
 
   return (
     <View style={{ flex: 1 }}>
-
+      {/* Slot is now always rendered, allowing navigation to work correctly */}
+      <GlobalHeader />
       <Slot />
       <StatusBar style="light" backgroundColor="#000000" translucent />
 

@@ -18,7 +18,7 @@ export default function FeedScreen() {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handleCreatePost = async (data: { title: string; description:string; content: any; imageUri?: string; tags?: string[] }) => {
+  const handleCreatePost = async (data: { title: string; description:string; content: any; imageUris?: string[]; videoUris?: string[]; tags?: string[] }) => {
     await createPost(data);
   };
 

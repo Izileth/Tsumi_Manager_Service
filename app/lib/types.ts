@@ -82,6 +82,7 @@ export type Post = {
   post_reactions: PostReaction[];
   post_comments: PostComment[];
   images?: string[]; // Array of image URLs
+  videos?: string[]; // Array of video URLs
   hashtags: { tag: string }[];
 };
 

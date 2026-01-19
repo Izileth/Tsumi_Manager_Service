@@ -1,13 +1,19 @@
 import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Image } from 'react-native';
+import { View, Text, TextInput, Pressable, Image, FlatList } from 'react-native';
 import { AppBottomSheet } from '@/components/ui/bottom-sheet';
 import { CustomButton } from '@/components/ui/custom-button';
 import * as ImagePicker from 'expo-image-picker';
 import Toast from 'react-native-toast-message';
-import { Image as ImageIcon, X } from 'lucide-react-native';
+import { Image as ImageIcon, X, Video } from 'lucide-react-native';
 import { Post } from '@/app/lib/types';
+
+type MediaAsset = {
+  uri: string;
+  type: 'image' | 'video';
+};
+
 type CreatePostSheetProps = {
-  onSubmit: (data: { title: string; description: string; content: any; imageUri?: string; tags?: string[] }) => Promise<void>;
+  onSubmit: (data: { title: string; description: string; content: any; imageUris?: string[]; videoUris?: string[]; tags?: string[] }) => Promise<void>;
   onUpdate: (postId: string, data: Partial<Post>) => Promise<void>;
 };
 
@@ -16,7 +22,7 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
-  const [imageUri, setImageUri] = useState<string | undefined>();
+  const [media, setMedia] = useState<MediaAsset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const sheetRef = useRef<any>(null);
 
@@ -27,13 +33,17 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
       setTitle(postToEdit.title);
       setDescription(postToEdit.description || '');
       setTags(postToEdit.hashtags?.map(h => h.tag).join(', ') || '');
-      setImageUri(postToEdit.images?.[0]);
+      
+      const images: MediaAsset[] = (postToEdit.images || []).map(uri => ({ uri, type: 'image' }));
+      const videos: MediaAsset[] = (postToEdit.videos || []).map(uri => ({ uri, type: 'video' }));
+      setMedia([...images, ...videos]);
+
     } else {
       // Reset fields when closing edit mode
       setTitle('');
       setDescription('');
       setTags('');
-      setImageUri(undefined);
+      setMedia([]);
     }
   }, [postToEdit]);
 
@@ -49,22 +59,29 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
     dismiss: () => sheetRef.current?.dismiss(),
   }));
 
-  const handlePickImage = async () => {
+  const handlePickMedia = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Toast.show({ type: "error", text1: "Permissão necessária" });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true,
       quality: 0.8,
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const newAssets = result.assets.map(asset => ({
+        uri: asset.uri,
+        type: asset.type === 'video' ? 'video' : 'image',
+      } as MediaAsset));
+      setMedia(prevMedia => [...prevMedia, ...newAssets]);
     }
+  };
+  
+  const removeMedia = (uriToRemove: string) => {
+    setMedia(prevMedia => prevMedia.filter(m => m.uri !== uriToRemove));
   };
 
   const cleanup = () => {
@@ -72,7 +89,7 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
     setTitle('');
     setDescription('');
     setTags('');
-    setImageUri(undefined);
+    setMedia([]);
     setPostToEdit(null);
     sheetRef.current?.dismiss();
   };
@@ -80,15 +97,18 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
   const handleSubmit = async () => {
     setIsLoading(true);
     const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+    const imageUris = media.filter(m => m.type === 'image').map(m => m.uri);
+    const videoUris = media.filter(m => m.type === 'video').map(m => m.uri);
 
     if (isEditMode) {
-      // Update logic
+      // NOTE: For simplicity, this replaces all images/videos on every update.
+      // A more robust solution might track new vs. existing media to avoid re-uploading.
       await onUpdate(postToEdit.id, {
         title,
         description,
         content: { text: description },
-        // Handling image updates would be more complex, e.g., only upload if changed.
-        // For now, we pass the existing or new URI.
+        images: imageUris,
+        videos: videoUris,
       });
     } else {
       // Create logic
@@ -96,7 +116,8 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
         title,
         description,
         content: { text: description },
-        imageUri,
+        imageUris,
+        videoUris,
         tags: tagArray,
       });
     }
@@ -170,39 +191,60 @@ export const CreatePostSheet = forwardRef(({ onSubmit, onUpdate }: CreatePostShe
           </View>
         </View>
         
-        {/* Imagem */}
+        {/* Mídia */}
         <View>
           <View className="flex-row items-center mb-2">
             <View className="w-1 h-4 bg-red-600 mr-2" />
-            <Text className="text-neutral-400 text-xs font-bold tracking-widest">IMAGEM</Text>
-            <Text className="text-red-600 text-xs ml-1.5">画像</Text>
+            <Text className="text-neutral-400 text-xs font-bold tracking-widest">MÍDIA</Text>
+            <Text className="text-red-600 text-xs ml-1.5">メディア</Text>
           </View>
           
-          {imageUri ? (
-            <View className="relative">
-              <Image 
-                source={{ uri: imageUri }} 
-                className="w-full h-48 rounded-lg"
-              />
-              <View className="absolute inset-0 bg-black/20 rounded-lg" />
-              <Pressable 
-                onPress={() => setImageUri(undefined)} 
-                className="absolute top-3 right-3 w-8 h-8 bg-black/80 rounded-full items-center justify-center border border-red-600/50"
-              >
-                <X size={16} color="#ef4444" />
-              </Pressable>
-              <View className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b-lg" />
-            </View>
+          {media.length > 0 ? (
+            <FlatList
+              horizontal
+              data={media}
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.uri}
+              contentContainerClassName="gap-2 py-4"
+              renderItem={({ item }) => (
+                <View className="relative w-24 h-24">
+                  <Image 
+                    source={{ uri: item.uri }} 
+                    className="w-full h-full rounded-lg"
+                  />
+                  {item.type === 'video' && (
+                    <View className="absolute inset-0 bg-black/50 rounded-lg items-center justify-center">
+                      <Video size={24} color="#fff" />
+                    </View>
+                  )}
+                  <Pressable 
+                    onPress={() => removeMedia(item.uri)} 
+                    className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-black rounded-full items-center justify-center border border-red-600"
+                  >
+                    <X size={12} color="#ef4444" />
+                  </Pressable>
+                </View>
+              )}
+              ListFooterComponent={
+                <Pressable 
+                  onPress={handlePickMedia} 
+                  className="w-24 h-24 border-2 border-dashed border-zinc-800 bg-black rounded-lg items-center justify-center"
+                >
+                  <ImageIcon size={24} color="#a1a1aa" />
+                  <Text className="text-zinc-500 text-xs mt-1">Adicionar</Text>
+                </Pressable>
+              }
+            />
           ) : (
             <Pressable 
-              onPress={handlePickImage} 
+              onPress={handlePickMedia} 
               className="border-2 border-dashed border-zinc-800 bg-black rounded-lg py-10 items-center justify-center "
             >
               <View className="items-center gap-2">
                 <View className="w-12 h-12 bg-red-950/30 rounded-full items-center justify-center">
                   <ImageIcon size={24} color="#ef4444" />
                 </View>
-                <Text className="text-neutral-500 text-sm">Anexar Imagem</Text>
+                <Text className="text-neutral-500 text-sm">Anexar Mídias</Text>
                 <Text className="text-neutral-700 text-xs">Toque para selecionar</Text>
               </View>
             </Pressable>

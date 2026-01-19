@@ -75,6 +75,18 @@ export function HomeContent({ profile, handleLogout, loggingOut }: HomeContentPr
           </Pressable>
         </Link>
 
+        
+        <Link href="/feed" asChild>
+          <Pressable className="active:opacity-70">
+            <View className="flex-row items-center justify-between bg-black p-4 rounded-lg border border-neutral-800 mb-3">
+              <View className="flex-row items-center gap-3">
+                <Text className="text-white font-semibold text-base">Explorar Feed</Text>
+              </View>
+              <Text className="text-red-500">→</Text>
+            </View>
+          </Pressable>
+        </Link>
+
         <Link href="/clan" asChild>
           <Pressable className="active:opacity-70">
             <View className="flex-row items-center justify-between bg-black p-4 rounded-lg border border-neutral-800 mb-3">

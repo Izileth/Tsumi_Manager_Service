@@ -93,10 +93,6 @@ export default function LoadingScreen({ onAnimationEnd }: LoadingScreenProps) {
 
   return (
     <View className="flex-1 bg-black justify-center items-center">
-      {/* Gradient Effects */}
-      <View className="absolute -top-24 -right-24 w-72 h-72 bg-red-600 opacity-10 rounded-full blur-3xl" />
-      <View className="absolute -bottom-36 -left-36 w-96 h-96 bg-orange-900 opacity-5 rounded-full blur-3xl" />
-
       {/* Círculo Externo Rotativo */}
       <Animated.View 
         style={[circleAnimatedStyles]}

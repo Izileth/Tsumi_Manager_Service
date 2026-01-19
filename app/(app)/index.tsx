@@ -7,7 +7,6 @@ import { CreateProfilePrompt } from '@/app/components/home/CreateProfilePrompt';
 import { PullToRevealSymbol } from '@/app/components/home/PullToRevealSymbol';
 import { HomeHeader } from '@/app/components/home/HomeHeader';
 import { HomeContent } from '@/app/components/home/HomeContent';
-
 export default function HomeScreen() {
   const { logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -43,21 +42,23 @@ export default function HomeScreen() {
   }
 
   return (
-    <View className="flex-1 bg-black">
-      <PullToRevealSymbol scrollY={scrollY} />
+    <>
+      <View className="flex-1 bg-black">
+        <PullToRevealSymbol scrollY={scrollY} />
 
-      <Animated.ScrollView
-        className="flex-1"
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: true,
-        })}
-        scrollEventThrottle={16}
-        bounces={true}
-        showsVerticalScrollIndicator={false}
-      >
-        <HomeHeader profile={profile} />
-        <HomeContent profile={profile} handleLogout={handleLogout} loggingOut={loggingOut} />
-      </Animated.ScrollView>
-    </View>
+        <Animated.ScrollView
+          className="flex-1"
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: true,
+          })}
+          scrollEventThrottle={16}
+          bounces={true}
+          showsVerticalScrollIndicator={false}
+        >
+          <HomeHeader profile={profile} />
+          <HomeContent profile={profile} handleLogout={handleLogout} loggingOut={loggingOut} />
+        </Animated.ScrollView>
+      </View>
+    </>
   );
 }

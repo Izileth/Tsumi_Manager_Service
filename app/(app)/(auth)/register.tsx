@@ -102,13 +102,11 @@ export default function RegisterScreen() {
       <View className="flex-1 justify-center items-center px-8">
         {/* Logo */}
         <View className="items-center mb-12">
-          <View className="w-20 h-20 rounded-full bg-transparent border-2 border-red-600 justify-center items-center mb-4 shadow-lg shadow-red-600/50">
             <Image
               source={require("../../../assets/images/notification_icon.png")}
-              className="w-16 h-16"
+              className="w-24 h-24"
               resizeMode="contain"
             />
-          </View>
           <Text className="text-5xl font-bold text-white tracking-widest mb-1">TSUMI</Text>
           <Text className="text-sm text-neutral-400 tracking-widest mb-4">Yakuza Brotherhood</Text>
           <View className="w-16 h-0.5 bg-red-600 mt-2" />
